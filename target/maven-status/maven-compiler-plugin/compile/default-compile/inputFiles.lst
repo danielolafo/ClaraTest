@@ -1,0 +1,10 @@
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\ClaraTestApplication.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\controller\ArtistController.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\dto\ArtistRequestDto.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\dto\ArtistResponseDto.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\dto\ImageDto.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\dto\ResponseWrapper.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\feign\DiscogFeign.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\DiscogService.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\impl\DiscogServiceImpl.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\utils\Constants.java
