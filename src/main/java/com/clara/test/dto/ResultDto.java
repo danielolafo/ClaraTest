@@ -20,14 +20,14 @@ public class ResultDto {
 	private List<String> style;
 	private int id;
 	private List<String> barcode;
-	private UserDataDto user_data;
-	private int master_id;
-	private String master_url;
+	private UserDataDto userData;
+	private int masterId;
+	private String masterUrl;
 	private String uri;
 	private String catno;
 	private String title;
 	private String thumb;
-	private String cover_image;
-	private String resource_url;
+	private String coverImage;
+	private String resourceUrl;
 	private CommunityDto community;
 }
