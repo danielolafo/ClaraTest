@@ -2,6 +2,8 @@ package com.clara.test.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +23,8 @@ public class ResultDto {
 	private int id;
 	private List<String> barcode;
 	private UserDataDto userData;
+	
+	@JsonProperty("master_id")
 	private int masterId;
 	private String masterUrl;
 	private String uri;

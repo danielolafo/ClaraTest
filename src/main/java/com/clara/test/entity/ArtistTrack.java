@@ -1,31 +1,30 @@
 package com.clara.test.entity;
 
-import java.util.Set;
+import javax.sound.midi.Track;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name="SONG")
-public class Song {
+@Table(name="ARTIST_TRACK")
+public class ArtistTrack {
 	
-	private String name;
-	
-    public String type_;
-    
-    @Id
+	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
             name = "primary_sequence",
@@ -39,25 +38,12 @@ public class Song {
     )
     private Integer id;
 
-    @Column(nullable = false, length = 100)
-    private String trackName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "track_id", nullable = false)
+    private Track track;
 
-    @Column(length = 3)
-    private String position;
-
-    @Column(length = 100)
-    private String type;
-
-    @Column(length = 500)
-    private String title;
-
-    @Column(length = 10)
-    private String duration;
-
-    @Column
-    private Integer extraArtistId;
-
-    @OneToMany(mappedBy = "track")
-    private Set<ArtistTrack> trackArtistTracks;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ea_id")
+    private ExtraArtist ea;
 
 }

@@ -44,10 +44,10 @@ public class Artist {
     @Column(nullable = false, length = 100)
     private String releasesUrl;
 
-    @Column(nullable = false, length = 100)
+    @Column(length = 100, name="real_name")
     private String realName;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 10000)
     private String artistProfile;
 
     @Column(nullable = false, length = 100)
