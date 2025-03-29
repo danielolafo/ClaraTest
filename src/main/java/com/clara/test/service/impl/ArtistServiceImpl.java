@@ -51,7 +51,7 @@ public class ArtistServiceImpl implements ArtistService {
 		if(artistOpt.isPresent()) {
 			return new ResponseEntity<ResponseWrapper<ArtistResponseDto>>(
 					ResponseWrapper.<ArtistResponseDto>builder()
-					.data(artistResponseDto)
+					.data(ArtistMapper.INSTANCE.toDto(artistOpt.get()))
 					.message(HttpStatus.OK.getReasonPhrase())
 					.status(HttpStatus.OK)
 					.build(),

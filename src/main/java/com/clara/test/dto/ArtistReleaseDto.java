@@ -13,7 +13,7 @@ import lombok.Setter;
 @Builder
 public class ArtistReleaseDto {
 
-	public int id;
+	public Integer id;
     public String title;
     public String type;
     public int main_release;

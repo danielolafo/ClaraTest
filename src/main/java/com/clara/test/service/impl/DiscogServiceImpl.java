@@ -20,6 +20,7 @@ import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.entity.ArtistRelease;
 import com.clara.test.feign.DiscogFeign;
 import com.clara.test.mapper.ArtistMapper;
+import com.clara.test.mapper.ArtistReleaseMapper;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
@@ -82,14 +83,13 @@ public class DiscogServiceImpl implements DiscogService {
 		//Query in ArtistRelease by Discogs Artist id and Release id
 		//doing a JOIN between these three tables and filtering 
 		//by Discogs values
-		ArtistReleaseDto artistReleaseDto = ArtistReleaseDto.builder().artist(artistResponseDto2.getName()).title("ANY").build();
-		ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistReleaseResp = this.artistReleaseService.findByNameAndTitle(artistReleaseDto);
+//		ArtistReleaseDto artistReleaseDto = ArtistReleaseDto.builder().artist(artistResponseDto2.getName()).title("ANY").build();
+//		ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistReleaseResp = this.artistReleaseService.findByNameAndTitle(artistReleaseDto);
+//		
+//		if(artistReleaseResp.getStatusCode().is2xxSuccessful()) {
+//			
+//		}
 		
-		if(artistReleaseResp.getStatusCode().is2xxSuccessful()) {
-			
-		}
-		
-		//Alternative join query is filtering using Artis name and release title
 		
 		//Set current artist id
 		releases.getBody().getData().stream().forEach(rel -> {
@@ -99,6 +99,23 @@ public class DiscogServiceImpl implements DiscogService {
 					.artist(ArtistMapper.INSTANCE.toArtist(artistQueryResp.getBody().getData()))
 					.build());
 			rel.setReleaseArtistReleases(setArtistRelease);
+			
+			//Query in ArtistRelease by Discogs Artist id and Release id
+			//doing a JOIN between these three tables and filtering 
+			//by Discogs values
+			ArtistReleaseDto artistReleaseDto = ArtistReleaseDto.builder().artist(artistResponseDto2.getName()).title(rel.getTitle()).build();
+			ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistReleaseResp = this.artistReleaseService.findByNameAndTitle(artistReleaseDto);
+			ResponseEntity<ResponseWrapper<ArtistReleaseDto>> respArtRelease;
+			
+			if(artistReleaseResp.getStatusCode().is2xxSuccessful()) {
+				setArtistRelease.add(ArtistRelease.builder().id(artistReleaseResp.getBody().getData().get(0).getId()).build());
+				rel.setReleaseArtistReleases(setArtistRelease);
+			}else{
+				artistResponseDto2.setName(artistQueryResp.getBody().getData().getName());
+				respArtRelease = this.artistReleaseService.insert(ArtistReleaseDto.builder().artistResponseDto(artistQueryResp.getBody().getData()).release(rel).artist(artistQueryResp.getBody().getData().getName()).build());
+				setArtistRelease.add(ArtistReleaseMapper.INSTANCE.toEntity(artistReleaseResp.getBody().getData().get(0)));
+				rel.setReleaseArtistReleases(setArtistRelease);
+			}
 		});
 		this.releaseService.insert(releases.getBody().getData());
 		

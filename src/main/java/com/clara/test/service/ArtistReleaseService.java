@@ -12,9 +12,12 @@ public interface ArtistReleaseService {
 	public ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> saveAll(
 			List<ArtistReleaseDto> lstArtistReleaseDtos);
 	
-	public ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> save(
+	public ResponseEntity<ResponseWrapper<ArtistReleaseDto>> save(
 			ArtistReleaseDto artistReleaseDto);
 	
 	public ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> findByNameAndTitle(ArtistReleaseDto artistReleaseDto);
+	
+	public ResponseEntity<ResponseWrapper<ArtistReleaseDto>> insert(
+			ArtistReleaseDto artistReleaseDto);
 
 }
