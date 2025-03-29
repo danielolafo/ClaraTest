@@ -11,16 +11,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.clara.test.client.ReleaseWebClient;
 import com.clara.test.dto.ArtistDiscogResponseDto;
+import com.clara.test.dto.ArtistReleaseDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.MasterResponseDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
-import com.clara.test.entity.Artist;
 import com.clara.test.entity.ArtistRelease;
 import com.clara.test.feign.DiscogFeign;
 import com.clara.test.mapper.ArtistMapper;
 import com.clara.test.mapper.ReleaseMapper;
+import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
 import com.clara.test.service.DiscogService;
 import com.clara.test.service.ReleaseService;
@@ -40,13 +41,18 @@ public class DiscogServiceImpl implements DiscogService {
 	@NonNull
 	private ReleaseService releaseService;
 	
+	@NonNull
+	private ArtistReleaseService artistReleaseService;
+	
 	public DiscogServiceImpl(
 			DiscogFeign discogFeign,
 			ArtistService artistService,
-			ReleaseService releaseService) {
+			ReleaseService releaseService,
+			ArtistReleaseService artistReleaseService) {
 		this.discogFeign = discogFeign;
 		this.artistService = artistService;
 		this.releaseService = releaseService;
+		this.artistReleaseService = artistReleaseService;
 	}
 
 	@Override
@@ -72,6 +78,18 @@ public class DiscogServiceImpl implements DiscogService {
 		//Query artist by name in H2 database
 		artistResponseDto2.setName(artistRequestDto.getArtist());
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
+		
+		//Query in ArtistRelease by Discogs Artist id and Release id
+		//doing a JOIN between these three tables and filtering 
+		//by Discogs values
+		ArtistReleaseDto artistReleaseDto = ArtistReleaseDto.builder().artist(artistResponseDto2.getName()).title("ANY").build();
+		ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistReleaseResp = this.artistReleaseService.findByNameAndTitle(artistReleaseDto);
+		
+		if(artistReleaseResp.getStatusCode().is2xxSuccessful()) {
+			
+		}
+		
+		//Alternative join query is filtering using Artis name and release title
 		
 		//Set current artist id
 		releases.getBody().getData().stream().forEach(rel -> {

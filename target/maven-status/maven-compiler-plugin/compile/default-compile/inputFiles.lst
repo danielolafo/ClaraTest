@@ -40,10 +40,13 @@ C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\mapper\ArtistMapper.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\mapper\ArtistReleaseMapper.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\mapper\ReleaseMapper.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\repository\ArtistReleaseRepository.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\repository\ArtistRepository.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\repository\ReleaseRepository.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\ArtistReleaseService.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\ArtistService.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\DiscogService.java
+C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\impl\ArtistReleaseServiceImpl.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\impl\ArtistServiceImpl.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\impl\DiscogServiceImpl.java
 C:\Users\Lenovo\OneDrive\Documents\workspace-spring-tool-suite-4-4.10.0.RELEASE\ClaraTest\src\main\java\com\clara\test\service\impl\ReleaseServiceImpl.java
