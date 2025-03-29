@@ -1,6 +1,8 @@
 package com.clara.test.service.impl;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,14 @@ import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.MasterResponseDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.entity.Artist;
+import com.clara.test.entity.ArtistRelease;
 import com.clara.test.feign.DiscogFeign;
+import com.clara.test.mapper.ArtistMapper;
+import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.service.ArtistService;
 import com.clara.test.service.DiscogService;
+import com.clara.test.service.ReleaseService;
 import com.clara.test.utils.Webclient;
 
 import lombok.NonNull;
@@ -30,11 +37,16 @@ public class DiscogServiceImpl implements DiscogService {
 	@NonNull
 	private ArtistService artistService;
 	
+	@NonNull
+	private ReleaseService releaseService;
+	
 	public DiscogServiceImpl(
 			DiscogFeign discogFeign,
-			ArtistService artistService) {
+			ArtistService artistService,
+			ReleaseService releaseService) {
 		this.discogFeign = discogFeign;
 		this.artistService = artistService;
+		this.releaseService = releaseService;
 	}
 
 	@Override
@@ -56,6 +68,22 @@ public class DiscogServiceImpl implements DiscogService {
 		ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
 		artistResponseDto2.setReleasesUrl(artistResp.getBody().getData().getReleasesUrl());
 		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto2);
+		
+		//Query artist by name in H2 database
+		artistResponseDto2.setName(artistRequestDto.getArtist());
+		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
+		
+		//Set current artist id
+		releases.getBody().getData().stream().forEach(rel -> {
+			Set<ArtistRelease> setArtistRelease = new HashSet<>();
+			setArtistRelease.add(ArtistRelease.builder()
+					.release(ReleaseMapper.INSTANCE.toEntity(rel))
+					.artist(ArtistMapper.INSTANCE.toArtist(artistQueryResp.getBody().getData()))
+					.build());
+			rel.setReleaseArtistReleases(setArtistRelease);
+		});
+		this.releaseService.insert(releases.getBody().getData());
+		
 		
 		//Save tracks
 		

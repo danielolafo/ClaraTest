@@ -1,5 +1,7 @@
 package com.clara.test.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,28 @@ public class ArtistServiceImpl implements ArtistService {
 				.status(HttpStatus.OK)
 				.build(),
 				HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<ArtistResponseDto>> findByName(ArtistResponseDto artistResponseDto) {
+		Optional<Artist> artistOpt = this.artistRepository.findByName(artistResponseDto.getName());
+		if(artistOpt.isPresent()) {
+			return new ResponseEntity<ResponseWrapper<ArtistResponseDto>>(
+					ResponseWrapper.<ArtistResponseDto>builder()
+					.data(artistResponseDto)
+					.message(HttpStatus.OK.getReasonPhrase())
+					.status(HttpStatus.OK)
+					.build(),
+					HttpStatus.OK);
+		}else {
+			return new ResponseEntity<ResponseWrapper<ArtistResponseDto>>(
+					ResponseWrapper.<ArtistResponseDto>builder()
+					.data(ArtistResponseDto.builder().build())
+					.message(HttpStatus.NOT_FOUND.getReasonPhrase())
+					.status(HttpStatus.NOT_FOUND)
+					.build(),
+					HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

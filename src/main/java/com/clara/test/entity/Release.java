@@ -37,7 +37,7 @@ public class Release {
     )
     private Integer id;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String country;
 
     @Column

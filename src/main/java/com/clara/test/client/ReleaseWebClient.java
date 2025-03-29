@@ -33,7 +33,11 @@ public class ReleaseWebClient {
 			page++;
 			paginationUrl = releaseCollectionDto.getPagination().getUrls().getNext();
 		}
-		return new ResponseEntity<>(HttpStatus.OK);
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<ReleaseDto>>builder()
+				.data(lstReleaseDtos)
+				.build(),
+				HttpStatus.OK);
 	}
 
 }

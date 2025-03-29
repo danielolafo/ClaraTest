@@ -6,7 +6,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-28T21:50:10-0500",
+    date = "2025-03-28T23:24:32-0500",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.11 (Eclipse Adoptium)"
 )
 public class ArtistMapperImpl implements ArtistMapper {
@@ -17,17 +17,17 @@ public class ArtistMapperImpl implements ArtistMapper {
             return null;
         }
 
-        Artist artist = new Artist();
+        Artist.ArtistBuilder artist = Artist.builder();
 
-        artist.setArtistProfile( artistResponseDto.getProfile() );
-        artist.setDataQuality( artistResponseDto.getQuality() );
-        artist.setId( artistResponseDto.getId() );
-        artist.setName( artistResponseDto.getName() );
-        artist.setResourceUrl( artistResponseDto.getResourceUrl() );
-        artist.setUri( artistResponseDto.getUri() );
-        artist.setReleasesUrl( artistResponseDto.getReleasesUrl() );
-        artist.setRealName( artistResponseDto.getRealName() );
+        artist.artistProfile( artistResponseDto.getProfile() );
+        artist.dataQuality( artistResponseDto.getQuality() );
+        artist.id( artistResponseDto.getId() );
+        artist.name( artistResponseDto.getName() );
+        artist.resourceUrl( artistResponseDto.getResourceUrl() );
+        artist.uri( artistResponseDto.getUri() );
+        artist.releasesUrl( artistResponseDto.getReleasesUrl() );
+        artist.realName( artistResponseDto.getRealName() );
 
-        return artist;
+        return artist.build();
     }
 }
