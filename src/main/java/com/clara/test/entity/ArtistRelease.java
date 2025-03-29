@@ -1,13 +1,13 @@
 package com.clara.test.entity;
 
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -18,10 +18,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="COMMUNITY")
-public class Community {
-
-	
+@Table(name="ARTIST_RELEASE")
+public class ArtistRelease {
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
@@ -36,15 +34,11 @@ public class Community {
     )
     private Integer id;
 
-    @Column
-    private Integer want;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id", nullable = false)
+    private Artist artist;
 
-    @Column
-    private Integer have;
-
-    @OneToMany(mappedBy = "community")
-    private Set<Release> communityReleases;
-    
-    @OneToMany(mappedBy = "community")
-    private Set<Stat> communityStats;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "release_id", nullable = false)
+    private Release release;
 }

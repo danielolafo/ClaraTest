@@ -1,10 +1,13 @@
 package com.clara.test.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -44,7 +47,7 @@ public class Artist {
     @Column(nullable = false, length = 100)
     private String releasesUrl;
 
-    @Column(length = 100, name="real_name")
+    @Column(length = 100)
     private String realName;
 
     @Column(nullable = false, length = 10000)
@@ -52,4 +55,10 @@ public class Artist {
 
     @Column(nullable = false, length = 100)
     private String dataQuality;
+
+    @OneToMany(mappedBy = "artist")
+    private Set<ArtistRelease> artistArtistReleases;
+    
+    @OneToMany(mappedBy = "artist")
+    private Set<Member> artistMembers;
 }

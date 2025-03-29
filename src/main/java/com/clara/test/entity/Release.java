@@ -70,6 +70,12 @@ public class Release {
     @Column(length = 100)
     private String resourceUrl;
 
+    @Column(length = 100)
+    private String mainRelease;
+
+    @Column(length = 100)
+    private String releaseRolE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id")
     private Community community;
@@ -88,4 +94,10 @@ public class Release {
 
     @OneToMany(mappedBy = "release")
     private Set<Label> releaseLabels;
+
+    @OneToMany(mappedBy = "release")
+    private Set<Track> releaseTracks;
+
+    @OneToMany(mappedBy = "release")
+    private Set<ArtistRelease> releaseArtistReleases;
 }

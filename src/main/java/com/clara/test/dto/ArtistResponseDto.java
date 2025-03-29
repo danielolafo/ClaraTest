@@ -32,4 +32,8 @@ public class ArtistResponseDto {
 	private String quality;
 	
 	private String uri;
+	
+	private List<ArtistReleaseDto> artistReleases;
+	
+	private List<MemberDto> memebers;
 }
