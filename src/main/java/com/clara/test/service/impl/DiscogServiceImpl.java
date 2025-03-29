@@ -90,7 +90,7 @@ public class DiscogServiceImpl implements DiscogService {
 //			
 //		}
 		
-		
+		this.releaseService.insert(releases.getBody().getData());
 		//Set current artist id
 		releases.getBody().getData().stream().forEach(rel -> {
 			Set<ArtistRelease> setArtistRelease = new HashSet<>();
@@ -113,11 +113,11 @@ public class DiscogServiceImpl implements DiscogService {
 			}else{
 				artistResponseDto2.setName(artistQueryResp.getBody().getData().getName());
 				respArtRelease = this.artistReleaseService.insert(ArtistReleaseDto.builder().artistResponseDto(artistQueryResp.getBody().getData()).release(rel).artist(artistQueryResp.getBody().getData().getName()).build());
-				setArtistRelease.add(ArtistReleaseMapper.INSTANCE.toEntity(artistReleaseResp.getBody().getData().get(0)));
+				setArtistRelease.add(ArtistReleaseMapper.INSTANCE.toEntity(respArtRelease.getBody().getData()));
 				rel.setReleaseArtistReleases(setArtistRelease);
 			}
 		});
-		this.releaseService.insert(releases.getBody().getData());
+//		this.releaseService.insert(releases.getBody().getData());
 		
 		
 		//Save tracks
