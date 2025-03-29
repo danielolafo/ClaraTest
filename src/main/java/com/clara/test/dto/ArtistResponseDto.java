@@ -12,6 +12,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ArtistResponseDto {
+	
+	private PaginationDto pagination;
 
 	private Long id;
 	private String name;
