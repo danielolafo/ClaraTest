@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.clara.test.dto.ArtistReleaseDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.CommunityDto;
 import com.clara.test.dto.ReleaseDto;
@@ -17,6 +18,7 @@ import com.clara.test.entity.Release;
 import com.clara.test.mapper.CommunityMapper;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.repository.ReleaseRepository;
+import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
 import com.clara.test.service.CommunityService;
 import com.clara.test.service.ReleaseService;
@@ -33,14 +35,19 @@ public class ReleaseServiceImpl implements ReleaseService {
 	private CommunityService communityService;
 	
 	@NonNull
+	private ArtistReleaseService artistReleaseService;
+	
+	@NonNull
 	private ReleaseRepository repository;
 	
 	public ReleaseServiceImpl(
 			ArtistService artistService,
 			CommunityService communityService,
+			ArtistReleaseService artistReleaseService,
 			ReleaseRepository repository) {
 		this.artistService = artistService;
 		this.communityService = communityService;
+		this.artistReleaseService = artistReleaseService;
 		this.repository = repository;
 	}
 
@@ -89,13 +96,6 @@ public class ReleaseServiceImpl implements ReleaseService {
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(lstReleaseDtos.get(0).getArtistId());
 		List<Release> lstCurrentReleases = this.repository.findByArtist(artistResp.getBody().getData().getId().intValue());
 		
-		//Get all community data and save It
-//		List<Community> lstCommunity = lstReleaseDtos.stream().map(rel -> rel.getCommunity()).collect(Collectors.toList());
-//		
-//		List<CommunityDto> lstCommunityDtos = new ArrayList<>();
-//		lstCommunity.forEach(com -> lstCommunityDtos.add(CommunityMapper.INSTANCE.toDto(com)));
-//		this.communityService.save(lstCommunityDtos);
-		
 		//Search for unsaved releases		
 		for(ReleaseDto releaseDto : lstReleaseDtos) {
 			List<Release> lstReleases = lstCurrentReleases.stream().filter(rel -> rel.getTitle().equals(lstCurrentReleases)).collect(Collectors.toList());
@@ -108,6 +108,13 @@ public class ReleaseServiceImpl implements ReleaseService {
 				release.setCommunity(CommunityMapper.INSTANCE.toEntity(lstSavedCommunities.getBody().getData().get(0)));
 				release = this.repository.save(release);
 				releaseDto.setId(release.getId());
+				
+				//Look for an artist-release relationship saved
+				ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistRelease = this.artistReleaseService.findByNameAndTitle(
+						ArtistReleaseDto.builder().artist(artistResp.getBody().getData().getName()).title(release.getTitle()).build());
+				if(!artistRelease.getStatusCode().is2xxSuccessful()) {
+					this.artistReleaseService.insert(ArtistReleaseDto.builder().artistResponseDto(artistResp.getBody().getData()).release(releaseDto).build());
+				}
 			}
 		}
 		
