@@ -3,10 +3,14 @@ package com.clara.test.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clara.test.dto.ArtistComparissonRequestDto;
+import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ResponseWrapper;
@@ -34,6 +38,14 @@ public class ArtistController {
 			@ModelAttribute ArtistRequestDto artistRequestDto){
 		
 		return discogService.getArtist(artistRequestDto);
+	}
+	
+	
+	@PostMapping("/compare-artists")
+	public ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> compareArtist(
+			@RequestBody ArtistComparissonRequestDto artistRequestDto){
+		
+		return discogService.compareArtists(artistRequestDto);
 	}
 
 }

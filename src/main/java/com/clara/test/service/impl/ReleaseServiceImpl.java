@@ -41,6 +41,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> insert(List<ReleaseDto> lstReleaseDtos) {
 		for(ReleaseDto releaseDto : lstReleaseDtos) {
+			releaseDto.setId(null);
 			ResponseEntity<ResponseWrapper<ReleaseDto>> resp = this.insert(releaseDto);
 			releaseDto.setId(resp.getBody().getData().getId());
 		}
@@ -49,6 +50,12 @@ public class ReleaseServiceImpl implements ReleaseService {
 				.data(lstReleaseDtos)
 				.build(),
 				HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

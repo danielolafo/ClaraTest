@@ -6,8 +6,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T18:04:28-0500",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.37.0.v20240215-1558, environment: Java 17.0.11 (Eclipse Adoptium)"
+    date = "2025-03-29T21:10:39-0500",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.11 (Eclipse Adoptium)"
 )
 public class ArtistMapperImpl implements ArtistMapper {
 
@@ -23,10 +23,10 @@ public class ArtistMapperImpl implements ArtistMapper {
         artist.dataQuality( artistResponseDto.getQuality() );
         artist.id( artistResponseDto.getId() );
         artist.name( artistResponseDto.getName() );
-        artist.realName( artistResponseDto.getRealName() );
-        artist.releasesUrl( artistResponseDto.getReleasesUrl() );
         artist.resourceUrl( artistResponseDto.getResourceUrl() );
         artist.uri( artistResponseDto.getUri() );
+        artist.releasesUrl( artistResponseDto.getReleasesUrl() );
+        artist.realName( artistResponseDto.getRealName() );
 
         return artist.build();
     }

@@ -1,20 +1,20 @@
 package com.clara.test.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
-public class ArtistRequestDto {
+public class ArtistComparissonResponseDto {
 
-	private String artist;
-	private String title;
-	private String releaseTitle;
-	private String token;
+	private List<ArtistResponseDto> artists;
+	
 }

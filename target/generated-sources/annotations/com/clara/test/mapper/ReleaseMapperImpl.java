@@ -15,7 +15,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-29T16:24:02-0500",
+    date = "2025-03-29T21:10:39-0500",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.11 (Eclipse Adoptium)"
 )
 public class ReleaseMapperImpl implements ReleaseMapper {

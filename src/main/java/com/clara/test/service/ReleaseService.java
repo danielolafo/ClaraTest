@@ -25,4 +25,8 @@ public interface ReleaseService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> insert(List<ReleaseDto> lstReleaseDtos);
+	
+	
+	
+	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId);
 }
