@@ -74,17 +74,20 @@ public class DiscogServiceImpl implements DiscogService {
 		//Extract and get the artist
 		ResponseEntity<ArtistResponseDto> artistResponseDto = discogFeign.getArtistById(masterResponse.getBody().getArtists().get(0).getId());
 		
-		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.insert(artistResponseDto.getBody());
+//		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.insert(artistResponseDto.getBody());
 		
 		//Save albums/releases
-		WebClient webClient = Webclient.getClient(artistResp.getBody().getData().getReleasesUrl());
+		WebClient webClient = Webclient.getClient(artistResponseDto.getBody().getReleasesUrl());
 		ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
-		artistResponseDto2.setReleasesUrl(artistResp.getBody().getData().getReleasesUrl());
-		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto2);
+		artistResponseDto2.setReleasesUrl(artistResponseDto.getBody().getReleasesUrl());
+		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto.getBody());
 		
 		//Query artist by name in H2 database
 		artistResponseDto2.setName(artistRequestDto.getArtist());
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
+		if(!artistQueryResp.getStatusCode().is2xxSuccessful()) {
+			this.artistService.insert(artistResponseDto.getBody());
+		}
 		
 		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> savedReleases = new ResponseEntity<>(
 				ResponseWrapper.<List<ReleaseDto>>builder()
@@ -93,11 +96,6 @@ public class DiscogServiceImpl implements DiscogService {
 				.status(HttpStatus.OK)
 				.build(),
 				HttpStatus.NOT_FOUND);
-		//Inserts the artist only if not exists by name in the database
-//		if(!artistQueryResp.getStatusCode().is2xxSuccessful()) {
-//			//savedReleases = this.releaseService.insert(releases.getBody().getData());
-//			this.artistService.insert(artistResponseDto2);
-//		}
 		
 		//Query releases in local database
 		savedReleases = this.releaseService.getReleasesByArtist(artistQueryResp.getBody().getData().getId().intValue());
@@ -107,6 +105,7 @@ public class DiscogServiceImpl implements DiscogService {
 			savedReleases = this.releaseService.insert(releases.getBody().getData());
 		}
 		
+		/*
 		//Set current artist id
 		savedReleases.getBody().getData().stream().forEach(rel -> {
 			
@@ -127,7 +126,7 @@ public class DiscogServiceImpl implements DiscogService {
 //				rel.setReleaseArtistReleases(setArtistRelease);
 			}
 		});
-		
+		*/
 		
 		//Save tracks
 		
