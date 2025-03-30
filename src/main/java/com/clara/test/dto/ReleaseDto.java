@@ -62,4 +62,6 @@ public class ReleaseDto {
 	private Set<Track> releaseTracks;
 
 	private Set<ArtistRelease> releaseArtistReleases;
+	
+	private Integer artistId;
 }

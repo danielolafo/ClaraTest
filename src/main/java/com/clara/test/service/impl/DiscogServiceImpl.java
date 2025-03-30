@@ -21,6 +21,7 @@ import com.clara.test.dto.MasterResponseDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.feign.DiscogFeign;
+import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
 import com.clara.test.service.DiscogService;
@@ -85,8 +86,11 @@ public class DiscogServiceImpl implements DiscogService {
 		//Query artist by name in H2 database
 		artistResponseDto2.setName(artistRequestDto.getArtist());
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
+		Integer newArtistId = null;
 		if(!artistQueryResp.getStatusCode().is2xxSuccessful()) {
-			this.artistService.insert(artistResponseDto.getBody());
+			newArtistId = this.artistService.insert(artistResponseDto.getBody()).getBody().getData().getId().intValue();
+		}else {
+			newArtistId = artistQueryResp.getBody().getData().getId().intValue();
 		}
 		
 		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> savedReleases = new ResponseEntity<>(
@@ -97,13 +101,23 @@ public class DiscogServiceImpl implements DiscogService {
 				.build(),
 				HttpStatus.NOT_FOUND);
 		
-		//Query releases in local database
-		savedReleases = this.releaseService.getReleasesByArtist(artistQueryResp.getBody().getData().getId().intValue());
+		//Save discography
+		List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
+		final Integer artistId = newArtistId;
+		discogResp.getBody().getResults().forEach(res-> {
+			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(res);
+			releaseDto.setArtistId(artistId);
+			lstReleaseDtos.add(releaseDto);
+		});
+		this.releaseService.save(lstReleaseDtos);
 		
-		//Save releases if do not exist by artist in local database
-		if(!savedReleases.getStatusCode().is2xxSuccessful()) {
-			savedReleases = this.releaseService.insert(releases.getBody().getData());
-		}
+//		//Query releases in local database
+//		savedReleases = this.releaseService.getReleasesByArtist(artistQueryResp.getBody().getData().getId().intValue());
+//		
+//		//Save releases if do not exist by artist in local database
+//		if(!savedReleases.getStatusCode().is2xxSuccessful()) {
+//			savedReleases = this.releaseService.insert(releases.getBody().getData());
+//		}
 		
 		/*
 		//Set current artist id

@@ -29,4 +29,12 @@ public interface ReleaseService {
 	
 	
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId);
+	
+	/**
+	 * <p>Save all discography. If a release exists in database doesn't save It</p>
+	 * @param lstReleaseDtos
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
+	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> save(List<ReleaseDto> lstReleaseDtos);
 }

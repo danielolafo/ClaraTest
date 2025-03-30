@@ -39,6 +39,9 @@ public class ArtistResponseDto {
 	
 	private String uri;
 	
+	@JsonProperty("results")
+	private List<ReleaseDto> releases;
+	
 	private List<ArtistReleaseDto> artistReleases;
 	
 	private List<MemberDto> memebers;

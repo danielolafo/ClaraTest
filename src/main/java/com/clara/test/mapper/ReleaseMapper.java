@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 import com.clara.test.dto.ReleaseDto;
+import com.clara.test.dto.ResultDto;
 import com.clara.test.entity.Release;
 
 @Mapper(uses = {ArtistReleaseMapper.class})
@@ -14,5 +15,7 @@ public interface ReleaseMapper {
 	public Release toEntity(ReleaseDto releaseDto);
 	
 	public ReleaseDto toDto(Release release);
+	
+	public ReleaseDto toDto(ResultDto resultDto);
 
 }
