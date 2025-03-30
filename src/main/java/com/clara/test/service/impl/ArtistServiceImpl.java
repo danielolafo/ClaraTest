@@ -67,4 +67,25 @@ public class ArtistServiceImpl implements ArtistService {
 		}
 	}
 
+	@Override
+	public ResponseEntity<ResponseWrapper<ArtistResponseDto>> findById(Integer artistId) {
+		Optional<Artist> artistOpt = this.artistRepository.findById(artistId);
+		if(artistOpt.isEmpty()) {
+			return new ResponseEntity<ResponseWrapper<ArtistResponseDto>>(
+					ResponseWrapper.<ArtistResponseDto>builder()
+					.data(ArtistResponseDto.builder().build())
+					.message(HttpStatus.NOT_FOUND.getReasonPhrase())
+					.status(HttpStatus.NOT_FOUND)
+					.build(),
+					HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<ResponseWrapper<ArtistResponseDto>>(
+				ResponseWrapper.<ArtistResponseDto>builder()
+				.data(ArtistMapper.INSTANCE.toDto(artistOpt.get()))
+				.message(HttpStatus.OK.getReasonPhrase())
+				.status(HttpStatus.OK)
+				.build(),
+				HttpStatus.OK);
+	}
+
 }

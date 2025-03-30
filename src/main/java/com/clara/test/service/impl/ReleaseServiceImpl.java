@@ -1,16 +1,19 @@
 package com.clara.test.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.entity.Release;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.repository.ReleaseRepository;
+import com.clara.test.service.ArtistService;
 import com.clara.test.service.ReleaseService;
 
 import lombok.NonNull;
@@ -19,9 +22,15 @@ import lombok.NonNull;
 public class ReleaseServiceImpl implements ReleaseService {
 	
 	@NonNull
+	private ArtistService artistService;
+	
+	@NonNull
 	private ReleaseRepository repository;
 	
-	public ReleaseServiceImpl(ReleaseRepository repository) {
+	public ReleaseServiceImpl(
+			ArtistService artistService,
+			ReleaseRepository repository) {
+		this.artistService = artistService;
 		this.repository = repository;
 	}
 
@@ -54,8 +63,14 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId) {
-		// TODO Auto-generated method stub
-		return null;
+		//ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(artistId);
+		List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
+		this.repository.findByArtist(artistId).forEach(rel -> lstReleaseDtos.add(ReleaseMapper.INSTANCE.toDto(rel)));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<ReleaseDto>>builder()
+				.data(lstReleaseDtos)
+				.build(),
+				!lstReleaseDtos.isEmpty()?  HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 }
