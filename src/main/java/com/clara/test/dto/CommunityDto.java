@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class CommunityDto {
 	
+	private Integer id;
 	private int want;
     private int have;
 

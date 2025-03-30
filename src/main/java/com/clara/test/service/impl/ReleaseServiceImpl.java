@@ -9,12 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.clara.test.dto.ArtistResponseDto;
+import com.clara.test.dto.CommunityDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.entity.Community;
 import com.clara.test.entity.Release;
+import com.clara.test.mapper.CommunityMapper;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.repository.ReleaseRepository;
 import com.clara.test.service.ArtistService;
+import com.clara.test.service.CommunityService;
 import com.clara.test.service.ReleaseService;
 
 import lombok.NonNull;
@@ -26,12 +30,17 @@ public class ReleaseServiceImpl implements ReleaseService {
 	private ArtistService artistService;
 	
 	@NonNull
+	private CommunityService communityService;
+	
+	@NonNull
 	private ReleaseRepository repository;
 	
 	public ReleaseServiceImpl(
 			ArtistService artistService,
+			CommunityService communityService,
 			ReleaseRepository repository) {
 		this.artistService = artistService;
+		this.communityService = communityService;
 		this.repository = repository;
 	}
 
@@ -80,13 +89,24 @@ public class ReleaseServiceImpl implements ReleaseService {
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(lstReleaseDtos.get(0).getArtistId());
 		List<Release> lstCurrentReleases = this.repository.findByArtist(artistResp.getBody().getData().getId().intValue());
 		
+		//Get all community data and save It
+//		List<Community> lstCommunity = lstReleaseDtos.stream().map(rel -> rel.getCommunity()).collect(Collectors.toList());
+//		
+//		List<CommunityDto> lstCommunityDtos = new ArrayList<>();
+//		lstCommunity.forEach(com -> lstCommunityDtos.add(CommunityMapper.INSTANCE.toDto(com)));
+//		this.communityService.save(lstCommunityDtos);
+		
 		//Search for unsaved releases		
 		for(ReleaseDto releaseDto : lstReleaseDtos) {
 			List<Release> lstReleases = lstCurrentReleases.stream().filter(rel -> rel.getTitle().equals(lstCurrentReleases)).collect(Collectors.toList());
 			if(lstReleases.isEmpty()) {
 				//Is new. Save It into the database
 				releaseDto.setId(null);
-				Release release = this.repository.save(ReleaseMapper.INSTANCE.toEntity(releaseDto));
+				Community community = releaseDto.getCommunity();
+				ResponseEntity<ResponseWrapper<List<CommunityDto>>> lstSavedCommunities = this.communityService.save(List.of(CommunityMapper.INSTANCE.toDto(community)));
+				Release release = ReleaseMapper.INSTANCE.toEntity(releaseDto);
+				release.setCommunity(CommunityMapper.INSTANCE.toEntity(lstSavedCommunities.getBody().getData().get(0)));
+				release = this.repository.save(release);
 				releaseDto.setId(release.getId());
 			}
 		}
