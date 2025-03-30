@@ -34,13 +34,13 @@ public class Image {
     @Column(nullable = false, length = 10)
     private String imageType;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 500)
     private String uri;
 
     @Column(nullable = false, length = 100)
     private String resourceUrl;
 
-    @Column(nullable = false, length = 150)
+    @Column(nullable = false, length = 650)
     private String uri150;
 
     @Column(nullable = false)

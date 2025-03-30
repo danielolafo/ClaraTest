@@ -52,13 +52,13 @@ public class Release {
     @Column(length = 100)
     private String masterUrl;
 
-    @Column(length = 100)
+    @Column(length = 500)
     private String uri;
 
     @Column(length = 50)
     private String catno;
 
-    @Column(length = 100)
+    @Column(length = 500)
     private String title;
 
     @Column(length = 500)

@@ -45,7 +45,7 @@ public class Artist {
     @Column(nullable = false, length = 100)
     private String resourceUrl;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 500)
     private String uri;
 
     @Column(nullable = false, length = 100)
