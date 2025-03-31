@@ -140,6 +140,15 @@ public class ReleaseServiceImpl implements ReleaseService {
 		release.setId(null);
 		Integer id = this.repository.save(release).getId();
 		releaseDto.setId(id);
+		
+		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(releaseDto.getArtistId());
+		//Look for an artist-release relationship saved
+		ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistRelease = this.artistReleaseService.findByNameAndTitle(
+				ArtistReleaseDto.builder().artist(artistResp.getBody().getData().getName()).title(release.getTitle()).build());
+		if(!artistRelease.getStatusCode().is2xxSuccessful()) {
+			this.artistReleaseService.insert(ArtistReleaseDto.builder().artistResponseDto(artistResp.getBody().getData()).release(releaseDto).build());
+		}
+		
 		return new ResponseEntity<>(
 				ResponseWrapper.<ReleaseDto>builder()
 				.data(releaseDto)

@@ -30,10 +30,14 @@ public class ReleaseWebClient {
 			paginationUrl = new StringBuilder().append(artistResponseDto.getReleasesUrl()).append("?page=").append(page).append("&per_page=").append(perPage).toString();
 			webClient = Webclient.getClient(paginationUrl);
 			ReleaseCollectionDto releaseCollectionDto = webClient.get().exchange().block().bodyToMono(ReleaseCollectionDto.class).block();
-			lstReleaseDtos.addAll(releaseCollectionDto.getReleases());
-			count += releaseCollectionDto.getReleases().size();
-			page++;
-			paginationUrl = releaseCollectionDto.getPagination().getUrls().getNext();
+			paginationUrl = null;
+			if(Objects.nonNull(releaseCollectionDto) && Objects.nonNull(releaseCollectionDto.getReleases())) {
+				lstReleaseDtos.addAll(releaseCollectionDto.getReleases());
+				count += releaseCollectionDto.getReleases().size();
+				page++;
+				paginationUrl = releaseCollectionDto.getPagination().getUrls().getNext();
+			}
+			
 		}
 		return new ResponseEntity<>(
 				ResponseWrapper.<List<ReleaseDto>>builder()

@@ -11,18 +11,27 @@ import com.clara.test.entity.Genre;
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
-	
+
 	Optional<Genre> findByGenreName(String name);
-	
-	@Query(value=
-			"""
+
+	@Query(value = """
 			SELECT g.* FROM GENRE g
 			JOIN RELEASE_GENRE gr
 			ON g.id = gr.genre_id
 			JOIN ARTIST_RELEASE ar
 			ON gr.release_id = ar.release_id
 			WHERE ar.artist_id= :artistId
-			""",
-			nativeQuery=true)
+			""", nativeQuery = true)
 	public List<Genre> findByArtist(Integer artistId);
+
+	@Query(value = """
+			SELECT g.GENRE_NAME, COUNT(1) FROM GENRE g
+			JOIN RELEASE_GENRE gr
+			ON g.id = gr.genre_id
+			JOIN ARTIST_RELEASE ar
+			ON gr.release_id = ar.release_id
+			WHERE ar.artist_id= :artistId
+			GROUP BY GENRE_NAME
+			""", nativeQuery = true)
+	public List<Genre> getGenresFrequencyByArtis(Integer artistId);
 }

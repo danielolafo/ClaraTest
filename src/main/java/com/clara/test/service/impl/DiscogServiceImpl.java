@@ -182,10 +182,14 @@ public class DiscogServiceImpl implements DiscogService {
 				
 				//Gets the saved data from local database
 				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
-				lstResp.add(ArtistMapper.INSTANCE.toDto(artistData.getBody().getData()));
 				
 				//Get Genres
 				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
+				ArtistDto artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
+				artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+				lstResp.add(artistDto);
+				
+				
 				//artistResp.getBody().getData().setGenres(lstRespGenresDtos.getBody().getData());;
 				
 				//Get Labels
@@ -193,7 +197,16 @@ public class DiscogServiceImpl implements DiscogService {
 				
 				//Get Styles
 			}else {
-				lstResp.add(ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData()));
+				ArtistDto artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
+				//Gets the saved data from local database
+				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
+				
+				//Get Genres
+				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
+				
+				artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+				lstResp.add(artistDto);
+				lstResp.add(artistDto);
 			}
 		}
 		ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();
