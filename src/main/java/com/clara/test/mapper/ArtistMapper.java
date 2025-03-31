@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import com.clara.test.dto.ArtistDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.entity.Artist;
 
@@ -20,5 +21,7 @@ public interface ArtistMapper {
 	
 	@InheritInverseConfiguration
 	public ArtistResponseDto toDto(Artist artist);
+	
+	public ArtistDto toDto(ArtistResponseDto artistResponseDto);
 
 }

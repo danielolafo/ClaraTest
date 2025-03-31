@@ -13,6 +13,7 @@ import com.clara.test.client.ReleaseWebClient;
 import com.clara.test.dto.ArtistComparissonRequestDto;
 import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
+import com.clara.test.dto.ArtistDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.GenreDto;
@@ -27,9 +28,9 @@ import com.clara.test.dto.ResultDto;
 import com.clara.test.dto.StyleDto;
 import com.clara.test.entity.Genre;
 import com.clara.test.entity.Label;
-import com.clara.test.entity.Release;
 import com.clara.test.entity.Style;
 import com.clara.test.feign.DiscogFeign;
+import com.clara.test.mapper.ArtistMapper;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
@@ -172,7 +173,7 @@ public class DiscogServiceImpl implements DiscogService {
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> compareArtists(
 			ArtistComparissonRequestDto artistComparissonRequestDto) {
-		List<ArtistResponseDto> lstResp = new ArrayList<>();
+		List<ArtistDto> lstResp = new ArrayList<>();
 		for(String artist : artistComparissonRequestDto.getArtists()) {
 			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
 			if(!artistResp.getStatusCode().is2xxSuccessful()) {
@@ -181,7 +182,7 @@ public class DiscogServiceImpl implements DiscogService {
 				
 				//Gets the saved data from local database
 				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
-				lstResp.add(artistData.getBody().getData());
+				lstResp.add(ArtistMapper.INSTANCE.toDto(artistData.getBody().getData()));
 				
 				//Get Genres
 				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
@@ -192,7 +193,7 @@ public class DiscogServiceImpl implements DiscogService {
 				
 				//Get Styles
 			}else {
-				lstResp.add(artistResp.getBody().getData());
+				lstResp.add(ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData()));
 			}
 		}
 		ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();

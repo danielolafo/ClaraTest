@@ -15,6 +15,6 @@ import lombok.Setter;
 @Builder
 public class ArtistComparissonResponseDto {
 
-	private List<ArtistResponseDto> artists;
+	private List<ArtistDto> artists;
 	
 }
