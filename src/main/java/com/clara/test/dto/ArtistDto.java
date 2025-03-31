@@ -2,6 +2,8 @@ package com.clara.test.dto;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,5 +43,11 @@ public class ArtistDto {
 	
 	private List<MemberDto> memebers;
 	
+	@JsonProperty("genres")
 	private List<String> lstGenres;
+	
+	@JsonProperty("tags")
+	private List<String> lstTags;
+	
+	private Integer yearsActive;
 }

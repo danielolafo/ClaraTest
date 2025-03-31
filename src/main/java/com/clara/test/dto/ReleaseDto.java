@@ -10,6 +10,7 @@ import com.clara.test.entity.Genre;
 import com.clara.test.entity.Label;
 import com.clara.test.entity.Style;
 import com.clara.test.entity.Track;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class ReleaseDto {
 
 	private String country;
 
+	@JsonProperty("year")
 	private Integer releaseYear;
 
 	private String releaseType;

@@ -19,8 +19,10 @@ import com.clara.test.repository.ArtistReleaseRepository;
 import com.clara.test.service.ArtistReleaseService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ArtistReleaseServiceImpl implements ArtistReleaseService {
 	
 	@NonNull
@@ -74,6 +76,19 @@ public class ArtistReleaseServiceImpl implements ArtistReleaseService {
 				.status(Objects.nonNull(artistReleaseDto.getId()) ? HttpStatus.OK : HttpStatus.NOT_FOUND)
 				.build(),
 				Objects.nonNull(artistReleaseDto.getId()) ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<Integer>>> getReleaseYears(Integer artistId) {
+		log.info("{} artistId :{}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistId);
+		List<Integer> lstReleaseYears = new ArrayList<>();
+		this.repository.getReleaseYears(artistId).forEach(year -> lstReleaseYears.add(year));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<Integer>>builder()
+				.data(lstReleaseYears)
+				.message(!lstReleaseYears.isEmpty() ? "OK" : "No results found")
+				.build(),
+				!lstReleaseYears.isEmpty() ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 }

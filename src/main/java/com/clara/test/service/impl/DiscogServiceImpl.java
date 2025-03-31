@@ -29,6 +29,8 @@ import com.clara.test.dto.StyleDto;
 import com.clara.test.entity.Genre;
 import com.clara.test.entity.Label;
 import com.clara.test.entity.Style;
+import com.clara.test.exception.InvalidValueException;
+import com.clara.test.exception.NotFoundException;
 import com.clara.test.feign.DiscogFeign;
 import com.clara.test.mapper.ArtistMapper;
 import com.clara.test.mapper.ReleaseMapper;
@@ -42,11 +44,14 @@ import com.clara.test.service.ReleaseLabelService;
 import com.clara.test.service.ReleaseService;
 import com.clara.test.service.ReleaseStyleService;
 import com.clara.test.service.StyleService;
+import com.clara.test.utils.CriteriaEnum;
 import com.clara.test.utils.Webclient;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class DiscogServiceImpl implements DiscogService {
 	
 	@NonNull
@@ -173,52 +178,69 @@ public class DiscogServiceImpl implements DiscogService {
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> compareArtists(
 			ArtistComparissonRequestDto artistComparissonRequestDto) {
-		List<ArtistDto> lstResp = new ArrayList<>();
-		for(String artist : artistComparissonRequestDto.getArtists()) {
-			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
-			if(!artistResp.getStatusCode().is2xxSuccessful()) {
-				//Get artist data from Discogs API and Save It into the database
-				ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> respSaveArtist = this.getArtist(ArtistRequestDto.builder().artist(artist).token(discogToken).build());
+		log.info("compareArtists");
+		try {
+			List<ArtistDto> lstResp = new ArrayList<>();
+			for(String artist : artistComparissonRequestDto.getArtists()) {
+				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
+				ArtistDto artistDto = null;
+				if(!artistResp.getStatusCode().is2xxSuccessful()) {
+					//Get artist data from Discogs API and Save It into the database
+					ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> respSaveArtist = this.getArtist(ArtistRequestDto.builder().artist(artist).token(discogToken).build());
+					
+					//Gets the saved data from local database
+					ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
+					
+					//Get Genres
+//					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
+					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistData.getBody().getData().getId().intValue());
+					artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
+					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+					lstResp.add(artistDto);
+					
+				}else {
+					artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
+					//Gets the saved data from local database
+					ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
+					
+					//Get Genres
+					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistData.getBody().getData().getId().intValue());
+					
+					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+					lstResp.add(artistDto);
+				}
 				
-				//Gets the saved data from local database
-				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
-				
-				//Get Genres
-				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
-				ArtistDto artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
-				artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
-				lstResp.add(artistDto);
-				
-				
-				//artistResp.getBody().getData().setGenres(lstRespGenresDtos.getBody().getData());;
-				
-				//Get Labels
-				//this.labelService
-				
-				//Get Styles
-			}else {
-				ArtistDto artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
-				//Gets the saved data from local database
-				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
-				
-				//Get Genres
-				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
-				
-				artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
-				lstResp.add(artistDto);
-				lstResp.add(artistDto);
+				//Set criteria data
+				//this.getCriteriaData(artistDto, artistComparissonRequestDto.getCriteria());
 			}
+			
+			ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();
+			return new ResponseEntity<>(
+					ResponseWrapper.<ArtistComparissonResponseDto>builder()
+					.data(artistComparissonResponseDto)
+					.message(artistComparissonResponseDto.getArtists().size()>0 ? "OK" : "No results found")
+					.status(HttpStatus.OK)
+					.build(),
+					HttpStatus.OK);
+		}catch(Exception ex) {
+			return new ResponseEntity<>(
+					ResponseWrapper.<ArtistComparissonResponseDto>builder()
+					.data(ArtistComparissonResponseDto.builder().build())
+					.message(HttpStatus.BAD_REQUEST.getReasonPhrase())
+					.status(HttpStatus.OK)
+					.build(),
+					HttpStatus.BAD_REQUEST);
 		}
-		ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();
-		return new ResponseEntity<>(
-				ResponseWrapper.<ArtistComparissonResponseDto>builder()
-				.data(artistComparissonResponseDto)
-				.message(artistComparissonResponseDto.getArtists().size()>0 ? "OK" : "No results found")
-				.status(HttpStatus.OK)
-				.build(),
-				HttpStatus.OK);
+		
 	}
 	
+	
+	/**
+	 * 
+	 * @param resultDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public List<Genre> setGenres(ResultDto resultDto){
 		for(String genre: resultDto.getGenre()) {
 			GenreDto genreDto = GenreDto.builder().genreName(genre).build();
@@ -234,6 +256,14 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
+	
+	/**
+	 * 
+	 * @param releaseDto
+	 * @param genreDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public Object saveReleaseGenre(ReleaseDto releaseDto, GenreDto genreDto) {
 		ResponseEntity<ResponseWrapper<ReleaseGenreDto>> releaseGenreResp = this.releaseGenreService.findByReleaseAndGenre(releaseDto.getId(), genreDto.getId());
 		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
@@ -242,6 +272,13 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
+	
+	/**
+	 * 
+	 * @param resultDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public List<Label> setLabels(ResultDto resultDto){
 		for(String label: resultDto.getLabel()) {
 			LabelDto labelDto = LabelDto.builder().labelName(label).build();
@@ -259,6 +296,13 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param releaseDto
+	 * @param labelDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public Object saveReleaseLabel(ReleaseDto releaseDto, LabelDto labelDto) {
 		ResponseEntity<ResponseWrapper<ReleaseLabelDto>> releaseLabelResp = this.releaseLabelService.findByReleaseAndLabel(releaseDto.getId(), labelDto.getId());
 		if(!releaseLabelResp.getStatusCode().is2xxSuccessful()) {
@@ -267,6 +311,12 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param resultDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public List<Style> setStyles(ResultDto resultDto){
 		for(String style: resultDto.getStyle()) {
 			StyleDto styleDto = StyleDto.builder().styleName(style).build();
@@ -284,12 +334,54 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param releaseDto
+	 * @param styleDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public Object saveReleaseStyle(ReleaseDto releaseDto, StyleDto styleDto) {
 		ResponseEntity<ResponseWrapper<ReleaseStyleDto>> releaseStyleResp = this.releaseStyleService.findByReleaseAndStyle(releaseDto.getId(), styleDto.getId());
 		if(!releaseStyleResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseStyleService.insert(ReleaseStyleDto.builder().release(releaseDto).style(styleDto).build());
 		}
 		return null;
+	}
+	
+	
+	private void getCriteriaData(
+			ArtistDto artistDto,
+			String criteria) throws InvalidValueException, NotFoundException{
+		log.info("getCriteriaData");
+		CriteriaEnum criteriaEnum = CriteriaEnum.getEnum(criteria);
+		switch(criteriaEnum) {
+		case RELEASES:
+			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releasesResp = this.releaseService.getReleasesByArtist(artistDto.getId().intValue());
+			artistDto.setReleases(releasesResp.getBody().getData());
+		case RELEASE_YEAR:
+			this.setYearsActive(artistDto);
+		case GENRES:
+			ResponseEntity<ResponseWrapper<List<GenreDto>>> genresResp = this.genreService.findByArtist(artistDto.getId().intValue());
+			artistDto.setLstGenres(genresResp.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+		case TAGS:
+			//this.labelService.
+		case STYLES:
+			
+		default:
+			throw new InvalidValueException("Invalid criteria search for the comparisson"); 
+		}
+	}
+	
+	private void setYearsActive(ArtistDto artistDto) throws NotFoundException {
+		log.info("setYearsActive");
+		ResponseEntity<ResponseWrapper<List<Integer>>> lstReleaseYearsResp =  this.artistReleaseService.getReleaseYears(artistDto.getId().intValue());
+		if(!lstReleaseYearsResp.getStatusCode().is2xxSuccessful()) {
+			throw new NotFoundException("No releases found for this artist");
+		}
+		
+		List<Integer> years = lstReleaseYearsResp.getBody().getData();
+		artistDto.setYearsActive(years.get(years.size())-years.get(0));
 	}
 
 	

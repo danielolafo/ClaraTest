@@ -14,6 +14,7 @@ com\clara\test\dto\ArtistRequestDto.class
 com\clara\test\dto\MasterResponseDto.class
 com\clara\test\dto\ResultDto.class
 com\clara\test\dto\CommunityDto.class
+com\clara\test\service\impl\DiscogServiceImpl$1.class
 com\clara\test\controller\ArtistController.class
 com\clara\test\service\impl\DiscogServiceImpl.class
 com\clara\test\dto\ResponseWrapper.class

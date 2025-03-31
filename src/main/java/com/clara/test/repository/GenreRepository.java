@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.clara.test.entity.Genre;
+import com.clara.test.entity.GenreProjection;
 
 @Repository
 public interface GenreRepository extends JpaRepository<Genre, Integer> {
@@ -33,5 +34,5 @@ public interface GenreRepository extends JpaRepository<Genre, Integer> {
 			WHERE ar.artist_id= :artistId
 			GROUP BY GENRE_NAME
 			""", nativeQuery = true)
-	public List<Genre> getGenresFrequencyByArtis(Integer artistId);
+	public List<GenreProjection> getGenresFrequencyByArtis(Integer artistId);
 }

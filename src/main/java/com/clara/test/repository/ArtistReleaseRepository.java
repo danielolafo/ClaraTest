@@ -1,5 +1,6 @@
 package com.clara.test.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,4 +20,17 @@ public interface ArtistReleaseRepository extends JpaRepository<ArtistRelease, In
 			AND r.title = :title
 			""", nativeQuery=true)
 	public Optional<ArtistRelease> findByArtistNameAndReleaseTitle(String name, String title);
+	
+	@Query(value=
+			"""
+			SELECT DISTINCT  R.RELEASE_YEAR 
+					FROM ARTIST_RELEASE ar
+					JOIN RELEASE r
+					ON ar.release_id = r.id
+					WHERE ar.artist_id= :artistId
+					AND r.RELEASE_YEAR IS NOT NULL
+			ORDER BY 1
+			""",
+			nativeQuery=true)
+	public List<Integer> getReleaseYears(Integer artistId);
 }

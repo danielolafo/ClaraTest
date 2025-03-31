@@ -17,4 +17,6 @@ public class GenreDto {
     private String genreName;
     
     private Set<ReleaseGenre> genreReleaseGenres;
+    
+    private Integer frequency;
 }

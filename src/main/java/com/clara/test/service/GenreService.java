@@ -17,4 +17,7 @@ public interface GenreService {
 	
 	public ResponseEntity<ResponseWrapper<List<GenreDto>>> findByArtist(
 			Integer artistId);
+	
+	
+	public ResponseEntity<ResponseWrapper<List<GenreDto>>> getGenreFrequencyByArtis(Integer artistId);
 }

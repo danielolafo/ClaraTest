@@ -81,4 +81,17 @@ public class GenreServiceImpl implements GenreService {
 				HttpStatus.OK);
 	}
 
+	@Override
+	public ResponseEntity<ResponseWrapper<List<GenreDto>>> getGenreFrequencyByArtis(Integer artistId) {
+		List<GenreDto> lstResp = new ArrayList<>();
+		this.repository.getGenresFrequencyByArtis(artistId).forEach(gen -> lstResp.add(GenreDto.builder().genreName(gen.getGenreName()).frequency(gen.getFrequency()).build()));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<GenreDto>>builder()
+				.data(lstResp)
+				.build(),
+				!lstResp.isEmpty() ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+	
+	
+
 }

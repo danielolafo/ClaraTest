@@ -1,6 +1,7 @@
 package com.clara.test.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.clara.test.dto.ReleaseDto;
@@ -16,6 +17,7 @@ public interface ReleaseMapper {
 	
 	public ReleaseDto toDto(Release release);
 	
+	@Mapping(target="releaseYear", source="year")
 	public ReleaseDto toDto(ResultDto resultDto);
 
 }

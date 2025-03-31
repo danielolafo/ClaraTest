@@ -1,5 +1,6 @@
 package com.clara.test.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,12 @@ public class LabelServiceImpl implements LabelService {
 				.data(LabelMapper.INSTANCE.toDto(labelOpt.get()))
 				.build(),
 				HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<LabelDto>>> getLabelFrequencyByArtis(Integer artistId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

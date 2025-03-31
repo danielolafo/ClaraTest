@@ -16,4 +16,5 @@ import lombok.Setter;
 public class ArtistComparissonRequestDto {
 
 	private List<String> artists;
+	private String criteria;
 }

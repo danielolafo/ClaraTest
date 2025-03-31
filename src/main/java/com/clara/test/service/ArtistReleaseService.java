@@ -19,5 +19,9 @@ public interface ArtistReleaseService {
 	
 	public ResponseEntity<ResponseWrapper<ArtistReleaseDto>> insert(
 			ArtistReleaseDto artistReleaseDto);
+	
+	
+	public ResponseEntity<ResponseWrapper<List<Integer>>> getReleaseYears(
+			Integer artistId);
 
 }
