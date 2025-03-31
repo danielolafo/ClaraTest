@@ -1,5 +1,7 @@
 package com.clara.test.service;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 
 import com.clara.test.dto.GenreDto;
@@ -12,4 +14,7 @@ public interface GenreService {
 	
 	public ResponseEntity<ResponseWrapper<GenreDto>> findByName(
 			GenreDto genreDto);
+	
+	public ResponseEntity<ResponseWrapper<List<GenreDto>>> findByArtist(
+			Integer artistId);
 }

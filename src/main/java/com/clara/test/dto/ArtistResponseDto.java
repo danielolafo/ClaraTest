@@ -45,4 +45,6 @@ public class ArtistResponseDto {
 	private List<ArtistReleaseDto> artistReleases;
 	
 	private List<MemberDto> memebers;
+	
+	//private List<GenreDto> genres;
 }

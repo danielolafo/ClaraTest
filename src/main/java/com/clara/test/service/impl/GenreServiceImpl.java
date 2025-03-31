@@ -1,10 +1,13 @@
 package com.clara.test.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.ls.LSException;
 
 import com.clara.test.dto.GenreDto;
 import com.clara.test.dto.ResponseWrapper;
@@ -56,6 +59,24 @@ public class GenreServiceImpl implements GenreService {
 		return new ResponseEntity<>(
 				ResponseWrapper.<GenreDto>builder()
 				.data(genreDto)
+				.build(),
+				HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<GenreDto>>> findByArtist(Integer artistId) {
+		List<GenreDto> lstGenreDto = new ArrayList<>();
+		this.repository.findByArtist(artistId).forEach(gen -> lstGenreDto.add(GenreMapper.INSTANCE.toDto(gen)));
+		if(lstGenreDto.isEmpty()) {
+			return new ResponseEntity<>(
+					ResponseWrapper.<List<GenreDto>>builder()
+					.data(lstGenreDto)
+					.build(),
+					HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<GenreDto>>builder()
+				.data(lstGenreDto)
 				.build(),
 				HttpStatus.OK);
 	}

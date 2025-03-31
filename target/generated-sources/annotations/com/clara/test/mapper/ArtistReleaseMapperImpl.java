@@ -13,8 +13,8 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-03-31T09:39:22-0500",
-    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.37.0.v20240215-1558, environment: Java 17.0.11 (Eclipse Adoptium)"
+    date = "2025-03-31T11:02:00-0500",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.11 (Eclipse Adoptium)"
 )
 public class ArtistReleaseMapperImpl implements ArtistReleaseMapper {
 
@@ -53,37 +53,37 @@ public class ArtistReleaseMapperImpl implements ArtistReleaseMapper {
 
         Release release = new Release();
 
-        release.setCatno( releaseDto.getCatno() );
-        release.setCommunity( releaseDto.getCommunity() );
-        release.setCountry( releaseDto.getCountry() );
-        release.setCoverImage( releaseDto.getCoverImage() );
         release.setId( releaseDto.getId() );
-        release.setMainRelease( releaseDto.getMainRelease() );
+        release.setCountry( releaseDto.getCountry() );
+        release.setReleaseYear( releaseDto.getReleaseYear() );
+        release.setReleaseType( releaseDto.getReleaseType() );
         release.setMasterId( releaseDto.getMasterId() );
         release.setMasterUrl( releaseDto.getMasterUrl() );
-        Set<ArtistRelease> set = releaseDto.getReleaseArtistReleases();
-        if ( set != null ) {
-            release.setReleaseArtistReleases( new LinkedHashSet<ArtistRelease>( set ) );
-        }
-        Set<Barcode> set1 = releaseDto.getReleaseBarcodes();
-        if ( set1 != null ) {
-            release.setReleaseBarcodes( new LinkedHashSet<Barcode>( set1 ) );
-        }
-        Set<Format> set2 = releaseDto.getReleaseFormats();
-        if ( set2 != null ) {
-            release.setReleaseFormats( new LinkedHashSet<Format>( set2 ) );
-        }
-        release.setReleaseRolE( releaseDto.getReleaseRolE() );
-        Set<Track> set3 = releaseDto.getReleaseTracks();
-        if ( set3 != null ) {
-            release.setReleaseTracks( new LinkedHashSet<Track>( set3 ) );
-        }
-        release.setReleaseType( releaseDto.getReleaseType() );
-        release.setReleaseYear( releaseDto.getReleaseYear() );
-        release.setResourceUrl( releaseDto.getResourceUrl() );
-        release.setThumb( releaseDto.getThumb() );
-        release.setTitle( releaseDto.getTitle() );
         release.setUri( releaseDto.getUri() );
+        release.setCatno( releaseDto.getCatno() );
+        release.setTitle( releaseDto.getTitle() );
+        release.setThumb( releaseDto.getThumb() );
+        release.setCoverImage( releaseDto.getCoverImage() );
+        release.setResourceUrl( releaseDto.getResourceUrl() );
+        release.setMainRelease( releaseDto.getMainRelease() );
+        release.setReleaseRolE( releaseDto.getReleaseRolE() );
+        release.setCommunity( releaseDto.getCommunity() );
+        Set<Barcode> set = releaseDto.getReleaseBarcodes();
+        if ( set != null ) {
+            release.setReleaseBarcodes( new LinkedHashSet<Barcode>( set ) );
+        }
+        Set<Format> set1 = releaseDto.getReleaseFormats();
+        if ( set1 != null ) {
+            release.setReleaseFormats( new LinkedHashSet<Format>( set1 ) );
+        }
+        Set<Track> set2 = releaseDto.getReleaseTracks();
+        if ( set2 != null ) {
+            release.setReleaseTracks( new LinkedHashSet<Track>( set2 ) );
+        }
+        Set<ArtistRelease> set3 = releaseDto.getReleaseArtistReleases();
+        if ( set3 != null ) {
+            release.setReleaseArtistReleases( new LinkedHashSet<ArtistRelease>( set3 ) );
+        }
 
         return release;
     }
@@ -95,37 +95,37 @@ public class ArtistReleaseMapperImpl implements ArtistReleaseMapper {
 
         ReleaseDto releaseDto = new ReleaseDto();
 
-        releaseDto.setCatno( release.getCatno() );
-        releaseDto.setCommunity( release.getCommunity() );
-        releaseDto.setCountry( release.getCountry() );
-        releaseDto.setCoverImage( release.getCoverImage() );
         releaseDto.setId( release.getId() );
-        releaseDto.setMainRelease( release.getMainRelease() );
+        releaseDto.setCountry( release.getCountry() );
+        releaseDto.setReleaseYear( release.getReleaseYear() );
+        releaseDto.setReleaseType( release.getReleaseType() );
         releaseDto.setMasterId( release.getMasterId() );
         releaseDto.setMasterUrl( release.getMasterUrl() );
-        Set<ArtistRelease> set = release.getReleaseArtistReleases();
-        if ( set != null ) {
-            releaseDto.setReleaseArtistReleases( new LinkedHashSet<ArtistRelease>( set ) );
-        }
-        Set<Barcode> set1 = release.getReleaseBarcodes();
-        if ( set1 != null ) {
-            releaseDto.setReleaseBarcodes( new LinkedHashSet<Barcode>( set1 ) );
-        }
-        Set<Format> set2 = release.getReleaseFormats();
-        if ( set2 != null ) {
-            releaseDto.setReleaseFormats( new LinkedHashSet<Format>( set2 ) );
-        }
-        releaseDto.setReleaseRolE( release.getReleaseRolE() );
-        Set<Track> set3 = release.getReleaseTracks();
-        if ( set3 != null ) {
-            releaseDto.setReleaseTracks( new LinkedHashSet<Track>( set3 ) );
-        }
-        releaseDto.setReleaseType( release.getReleaseType() );
-        releaseDto.setReleaseYear( release.getReleaseYear() );
-        releaseDto.setResourceUrl( release.getResourceUrl() );
-        releaseDto.setThumb( release.getThumb() );
-        releaseDto.setTitle( release.getTitle() );
         releaseDto.setUri( release.getUri() );
+        releaseDto.setCatno( release.getCatno() );
+        releaseDto.setTitle( release.getTitle() );
+        releaseDto.setThumb( release.getThumb() );
+        releaseDto.setCoverImage( release.getCoverImage() );
+        releaseDto.setResourceUrl( release.getResourceUrl() );
+        releaseDto.setMainRelease( release.getMainRelease() );
+        releaseDto.setReleaseRolE( release.getReleaseRolE() );
+        releaseDto.setCommunity( release.getCommunity() );
+        Set<Barcode> set = release.getReleaseBarcodes();
+        if ( set != null ) {
+            releaseDto.setReleaseBarcodes( new LinkedHashSet<Barcode>( set ) );
+        }
+        Set<Format> set1 = release.getReleaseFormats();
+        if ( set1 != null ) {
+            releaseDto.setReleaseFormats( new LinkedHashSet<Format>( set1 ) );
+        }
+        Set<Track> set2 = release.getReleaseTracks();
+        if ( set2 != null ) {
+            releaseDto.setReleaseTracks( new LinkedHashSet<Track>( set2 ) );
+        }
+        Set<ArtistRelease> set3 = release.getReleaseArtistReleases();
+        if ( set3 != null ) {
+            releaseDto.setReleaseArtistReleases( new LinkedHashSet<ArtistRelease>( set3 ) );
+        }
 
         return releaseDto;
     }

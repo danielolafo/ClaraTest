@@ -177,11 +177,20 @@ public class DiscogServiceImpl implements DiscogService {
 			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
 			if(!artistResp.getStatusCode().is2xxSuccessful()) {
 				//Get artist data from Discogs API and Save It into the database
-				this.getArtist(ArtistRequestDto.builder().artist(artist).token(discogToken).build());
+				ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> respSaveArtist = this.getArtist(ArtistRequestDto.builder().artist(artist).token(discogToken).build());
 				
 				//Gets the saved data from local database
 				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
 				lstResp.add(artistData.getBody().getData());
+				
+				//Get Genres
+				ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
+				//artistResp.getBody().getData().setGenres(lstRespGenresDtos.getBody().getData());;
+				
+				//Get Labels
+				//this.labelService
+				
+				//Get Styles
 			}else {
 				lstResp.add(artistResp.getBody().getData());
 			}

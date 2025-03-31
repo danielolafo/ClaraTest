@@ -4,7 +4,6 @@ import java.util.Set;
 
 import com.clara.test.entity.ReleaseGenre;
 
-import jakarta.persistence.OneToMany;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +16,5 @@ public class GenreDto {
 
     private String genreName;
     
-    @OneToMany(mappedBy = "genre")
     private Set<ReleaseGenre> genreReleaseGenres;
 }
