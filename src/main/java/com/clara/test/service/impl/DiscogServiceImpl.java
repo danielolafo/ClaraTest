@@ -247,9 +247,12 @@ public class DiscogServiceImpl implements DiscogService {
 	public List<Style> setStyles(ResultDto resultDto){
 		for(String style: resultDto.getStyle()) {
 			StyleDto styleDto = StyleDto.builder().styleName(style).build();
-			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.styleService.findByName(styleDto);
-			if(genreResp.getStatusCode().is2xxSuccessful()) {
-				this.styleService.insert(styleDto);
+			ResponseEntity<ResponseWrapper<StyleDto>> styleResp = this.styleService.findByName(styleDto);
+			if(!styleResp.getStatusCode().is2xxSuccessful()) {
+				ResponseEntity<ResponseWrapper<StyleDto>> styleSaveResp = this.styleService.insert(styleDto);
+				styleDto = styleSaveResp.getBody().getData();
+			}else {
+				styleDto = styleResp.getBody().getData();
 			}
 			
 			this.saveReleaseStyle(ReleaseMapper.INSTANCE.toDto(resultDto), styleDto);
@@ -259,8 +262,8 @@ public class DiscogServiceImpl implements DiscogService {
 	}
 	
 	public Object saveReleaseStyle(ReleaseDto releaseDto, StyleDto styleDto) {
-		ResponseEntity<ResponseWrapper<ReleaseStyleDto>> releaseGenreResp = this.releaseStyleService.findByReleaseAndStyle(releaseDto.getId(), styleDto.getId());
-		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
+		ResponseEntity<ResponseWrapper<ReleaseStyleDto>> releaseStyleResp = this.releaseStyleService.findByReleaseAndStyle(releaseDto.getId(), styleDto.getId());
+		if(!releaseStyleResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseStyleService.insert(ReleaseStyleDto.builder().release(releaseDto).style(styleDto).build());
 		}
 		return null;

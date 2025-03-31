@@ -1,10 +1,18 @@
 package com.clara.test.service.impl;
 
+import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.dto.StyleDto;
+import com.clara.test.entity.Label;
+import com.clara.test.entity.Style;
+import com.clara.test.mapper.LabelMapper;
+import com.clara.test.mapper.StyleMapper;
 import com.clara.test.repository.StyleRepository;
 import com.clara.test.service.StyleService;
 
@@ -21,14 +29,40 @@ public class StyleServiceImpl implements StyleService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<StyleDto>> insert(StyleDto styleDto) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Style> styleOpt = this.repository.findByStyleName(styleDto.getStyleName());
+		if(styleOpt.isPresent()) {
+			return new ResponseEntity<>(
+					ResponseWrapper.<StyleDto>builder()
+					.data(StyleDto.builder().build())
+					.build(),
+					HttpStatus.UNPROCESSABLE_ENTITY);
+		}
+		
+		Integer id = this.repository.save(StyleMapper.INSTANCE.toEntity(styleDto)).getId();
+		styleDto.setId(id);
+		return new ResponseEntity<>(
+				ResponseWrapper.<StyleDto>builder()
+				.data(styleDto)
+				.build(),
+				HttpStatus.OK);
 	}
 
 	@Override
 	public ResponseEntity<ResponseWrapper<StyleDto>> findByName(StyleDto styleDto) {
-		// TODO Auto-generated method stub
-		return null;
+		Optional<Style> styleOpt = this.repository.findByStyleName(styleDto.getStyleName());
+		if(styleOpt.isEmpty()) {
+			return new ResponseEntity<>(
+					ResponseWrapper.<StyleDto>builder()
+					.data(StyleDto.builder().build())
+					.build(),
+					HttpStatus.NOT_FOUND);
+		}
+		
+		return new ResponseEntity<>(
+				ResponseWrapper.<StyleDto>builder()
+				.data(StyleMapper.INSTANCE.toDto(styleOpt.get()))
+				.build(),
+				HttpStatus.OK);
 	}
 
 }

@@ -18,5 +18,5 @@ public class LabelDto {
 
     private String labelName;
     
-    private Set<ReleaseLabelDto> labelReleaseLabels;
+    //private Set<ReleaseLabelDto> labelReleaseLabels;
 }
