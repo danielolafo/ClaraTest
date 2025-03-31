@@ -3,7 +3,6 @@ package com.clara.test.service.impl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.clara.test.dto.GenreDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.dto.StyleDto;
 import com.clara.test.repository.StyleRepository;
@@ -21,13 +20,13 @@ public class StyleServiceImpl implements StyleService {
 	}
 
 	@Override
-	public ResponseEntity<ResponseWrapper<GenreDto>> insert(StyleDto styleDto) {
+	public ResponseEntity<ResponseWrapper<StyleDto>> insert(StyleDto styleDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseEntity<ResponseWrapper<GenreDto>> findByName(StyleDto styleDto) {
+	public ResponseEntity<ResponseWrapper<StyleDto>> findByName(StyleDto styleDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -11,7 +11,7 @@ public interface ReleaseLabelMapper {
 	
 	ReleaseLabelMapper INSTANCE = Mappers.getMapper(ReleaseLabelMapper.class);
 
-	ReleaseLabel toEntity(ReleaseLabel releaseLabel);
+	ReleaseLabel toEntity(ReleaseLabelDto releaseLabelDto);
 
 	ReleaseLabelDto toDto(ReleaseLabel releaseLabel);
 }

@@ -151,7 +151,8 @@ public class DiscogServiceImpl implements DiscogService {
 			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(res);
 			releaseDto.setArtistId(artistId);
 			lstReleaseDtos.add(releaseDto);
-			this.releaseService.save(releaseDto);
+			Integer releaseId = this.releaseService.save(releaseDto).getBody().getData().getId();
+			res.setId(releaseId);
 			this.setGenres(res);
 			this.setLabels(res);
 			this.setStyles(res);
@@ -221,9 +222,12 @@ public class DiscogServiceImpl implements DiscogService {
 	public List<Label> setLabels(ResultDto resultDto){
 		for(String label: resultDto.getLabel()) {
 			LabelDto labelDto = LabelDto.builder().labelName(label).build();
-			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.labelService.findByName(labelDto);
-			if(genreResp.getStatusCode().is2xxSuccessful()) {
-				this.labelService.insert(labelDto);
+			ResponseEntity<ResponseWrapper<LabelDto>> labelResp = this.labelService.findByName(labelDto);
+			if(!labelResp.getStatusCode().is2xxSuccessful()) {
+				ResponseEntity<ResponseWrapper<LabelDto>> labelSaveResp = this.labelService.insert(labelDto);
+				labelDto = labelSaveResp.getBody().getData();
+			}else {
+				labelDto = labelResp.getBody().getData();
 			}
 			
 			this.saveReleaseLabel(ReleaseMapper.INSTANCE.toDto(resultDto), labelDto);
@@ -233,8 +237,8 @@ public class DiscogServiceImpl implements DiscogService {
 	}
 	
 	public Object saveReleaseLabel(ReleaseDto releaseDto, LabelDto labelDto) {
-		ResponseEntity<ResponseWrapper<ReleaseLabelDto>> releaseGenreResp = this.releaseLabelService.findByReleaseAndLabel(releaseDto.getId(), labelDto.getId());
-		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
+		ResponseEntity<ResponseWrapper<ReleaseLabelDto>> releaseLabelResp = this.releaseLabelService.findByReleaseAndLabel(releaseDto.getId(), labelDto.getId());
+		if(!releaseLabelResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseLabelService.insert(ReleaseLabelDto.builder().release(releaseDto).label(labelDto).build());
 		}
 		return null;

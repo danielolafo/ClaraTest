@@ -52,6 +52,7 @@ public class GenreServiceImpl implements GenreService {
 					.build(),
 					HttpStatus.NOT_FOUND);
 		}
+		genreDto.setId(genreOpt.get().getId());
 		return new ResponseEntity<>(
 				ResponseWrapper.<GenreDto>builder()
 				.data(genreDto)

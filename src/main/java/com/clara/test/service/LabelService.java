@@ -7,9 +7,9 @@ import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.ResponseWrapper;
 
 public interface LabelService {
-	public ResponseEntity<ResponseWrapper<GenreDto>> insert(
+	public ResponseEntity<ResponseWrapper<LabelDto>> insert(
 			LabelDto labelDto);
 	
-	public ResponseEntity<ResponseWrapper<GenreDto>> findByName(
+	public ResponseEntity<ResponseWrapper<LabelDto>> findByName(
 			LabelDto labelDto);
 }

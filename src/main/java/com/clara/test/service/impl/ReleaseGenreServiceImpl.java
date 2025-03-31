@@ -33,7 +33,7 @@ public class ReleaseGenreServiceImpl implements ReleaseGenreService {
 		Integer id = this.repository.save(ReleaseGenreMapper.INSTANCE.toEntity(releaseGenreDto)).getId();
 		releaseGenreDto.setId(id);
 		return new ResponseEntity<>(
-				ResponseWrapper.<ReleaseGenreDto>builder().data(ReleaseGenreMapper.INSTANCE.toDto(releaseGenreOpt.get()))
+				ResponseWrapper.<ReleaseGenreDto>builder().data(releaseGenreDto)
 				.build(),
 				HttpStatus.OK);
 	}
