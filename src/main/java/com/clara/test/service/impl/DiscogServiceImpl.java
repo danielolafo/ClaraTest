@@ -2,7 +2,6 @@ package com.clara.test.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -14,18 +13,34 @@ import com.clara.test.client.ReleaseWebClient;
 import com.clara.test.dto.ArtistComparissonRequestDto;
 import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
-import com.clara.test.dto.ArtistReleaseDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ArtistResponseDto;
+import com.clara.test.dto.GenreDto;
+import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.MasterResponseDto;
 import com.clara.test.dto.ReleaseDto;
+import com.clara.test.dto.ReleaseGenreDto;
+import com.clara.test.dto.ReleaseLabelDto;
+import com.clara.test.dto.ReleaseStyleDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.dto.ResultDto;
+import com.clara.test.dto.StyleDto;
+import com.clara.test.entity.Genre;
+import com.clara.test.entity.Label;
+import com.clara.test.entity.Release;
+import com.clara.test.entity.Style;
 import com.clara.test.feign.DiscogFeign;
 import com.clara.test.mapper.ReleaseMapper;
 import com.clara.test.service.ArtistReleaseService;
 import com.clara.test.service.ArtistService;
 import com.clara.test.service.DiscogService;
+import com.clara.test.service.GenreService;
+import com.clara.test.service.LabelService;
+import com.clara.test.service.ReleaseGenreService;
+import com.clara.test.service.ReleaseLabelService;
 import com.clara.test.service.ReleaseService;
+import com.clara.test.service.ReleaseStyleService;
+import com.clara.test.service.StyleService;
 import com.clara.test.utils.Webclient;
 
 import lombok.NonNull;
@@ -45,8 +60,23 @@ public class DiscogServiceImpl implements DiscogService {
 	@NonNull
 	private ArtistReleaseService artistReleaseService;
 	
-//	@NonNull
-//	private Constants constants;
+	@NonNull
+	private LabelService labelService;
+	
+	@NonNull
+	private StyleService styleService;
+	
+	@NonNull
+	private GenreService genreService;
+	
+	@NonNull
+	private ReleaseLabelService releaseLabelService;
+	
+	@NonNull
+	private ReleaseGenreService releaseGenreService;
+	
+	@NonNull
+	private ReleaseStyleService releaseStyleService;
 	
 	@Value("${external.api.discog.token}")
 	private String discogToken;
@@ -55,11 +85,24 @@ public class DiscogServiceImpl implements DiscogService {
 			DiscogFeign discogFeign,
 			ArtistService artistService,
 			ReleaseService releaseService,
-			ArtistReleaseService artistReleaseService) {
+			ArtistReleaseService artistReleaseService,
+			LabelService labelService,
+			StyleService styleService,
+			GenreService genreService,
+			ReleaseLabelService releaseLabelService,
+			ReleaseGenreService releaseGenreService,
+			ReleaseStyleService releaseStyleService) {
 		this.discogFeign = discogFeign;
 		this.artistService = artistService;
 		this.releaseService = releaseService;
 		this.artistReleaseService = artistReleaseService;
+		this.labelService = labelService;
+		this.styleService = styleService;
+		this.genreService = genreService;
+		this.releaseLabelService = releaseLabelService;
+		this.releaseGenreService = releaseGenreService;
+		this.releaseStyleService = releaseStyleService;
+		
 		
 	}
 
@@ -108,43 +151,12 @@ public class DiscogServiceImpl implements DiscogService {
 			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(res);
 			releaseDto.setArtistId(artistId);
 			lstReleaseDtos.add(releaseDto);
+			this.releaseService.save(releaseDto);
+			this.setGenres(res);
+			this.setLabels(res);
+			this.setStyles(res);
 		});
-		this.releaseService.save(lstReleaseDtos);
-		
-//		//Query releases in local database
-//		savedReleases = this.releaseService.getReleasesByArtist(artistQueryResp.getBody().getData().getId().intValue());
-//		
-//		//Save releases if do not exist by artist in local database
-//		if(!savedReleases.getStatusCode().is2xxSuccessful()) {
-//			savedReleases = this.releaseService.insert(releases.getBody().getData());
-//		}
-		
-		/*
-		//Set current artist id
-		savedReleases.getBody().getData().stream().forEach(rel -> {
-			
-			//Query in ArtistRelease by Discogs Artist id and Release id
-			//doing a JOIN between these three tables and filtering 
-			//by Discogs values
-			ArtistReleaseDto artistReleaseDto = ArtistReleaseDto.builder().artist(artistResponseDto2.getName()).title(rel.getTitle()).build();
-			ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> artistReleaseResp = this.artistReleaseService.findByNameAndTitle(artistReleaseDto);
-			ResponseEntity<ResponseWrapper<ArtistReleaseDto>> respArtRelease;
-			
-			
-			//Save ArtistRelease
-			if(!artistReleaseResp.getStatusCode().is2xxSuccessful()) {
-				rel.setId(null); //Delete the Discogs id
-				artistResponseDto2.setName(artistQueryResp.getBody().getData().getName());
-				respArtRelease = this.artistReleaseService.insert(ArtistReleaseDto.builder().artistResponseDto(artistQueryResp.getBody().getData()).release(rel).artist(artistQueryResp.getBody().getData().getName()).build());
-//				setArtistRelease.add(ArtistReleaseMapper.INSTANCE.toEntity(respArtRelease.getBody().getData()));
-//				rel.setReleaseArtistReleases(setArtistRelease);
-			}
-		});
-		*/
-		
-		//Save tracks
-		
-		//Save artist members
+		//this.releaseService.save(lstReleaseDtos);
 		
 		
 		return new ResponseEntity<>(
@@ -181,6 +193,73 @@ public class DiscogServiceImpl implements DiscogService {
 				.status(HttpStatus.OK)
 				.build(),
 				HttpStatus.OK);
+	}
+	
+	public List<Genre> setGenres(ResultDto resultDto){
+		for(String genre: resultDto.getGenre()) {
+			GenreDto genreDto = GenreDto.builder().genreName(genre).build();
+			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.genreService.findByName(genreDto);
+			if(!genreResp.getStatusCode().is2xxSuccessful()) {
+				ResponseEntity<ResponseWrapper<GenreDto>> genreSaveResp =this.genreService.insert(genreDto);
+				genreDto = genreSaveResp.getBody().getData();
+			}
+			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(resultDto);
+			//releaseDto.setg
+			this.saveReleaseGenre(ReleaseMapper.INSTANCE.toDto(resultDto), genreDto);
+		}
+		return null;
+	}
+	
+	public Object saveReleaseGenre(ReleaseDto releaseDto, GenreDto genreDto) {
+		ResponseEntity<ResponseWrapper<ReleaseGenreDto>> releaseGenreResp = this.releaseGenreService.findByReleaseAndGenre(releaseDto.getId(), genreDto.getId());
+		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
+			this.releaseGenreService.insert(ReleaseGenreDto.builder().genre(genreDto).release(releaseDto).build());
+		}
+		return null;
+	}
+	
+	public List<Label> setLabels(ResultDto resultDto){
+		for(String label: resultDto.getLabel()) {
+			LabelDto labelDto = LabelDto.builder().labelName(label).build();
+			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.labelService.findByName(labelDto);
+			if(genreResp.getStatusCode().is2xxSuccessful()) {
+				this.labelService.insert(labelDto);
+			}
+			
+			this.saveReleaseLabel(ReleaseMapper.INSTANCE.toDto(resultDto), labelDto);
+			
+		}
+		return null;
+	}
+	
+	public Object saveReleaseLabel(ReleaseDto releaseDto, LabelDto labelDto) {
+		ResponseEntity<ResponseWrapper<ReleaseLabelDto>> releaseGenreResp = this.releaseLabelService.findByReleaseAndLabel(releaseDto.getId(), labelDto.getId());
+		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
+			this.releaseLabelService.insert(ReleaseLabelDto.builder().release(releaseDto).label(labelDto).build());
+		}
+		return null;
+	}
+	
+	public List<Style> setStyles(ResultDto resultDto){
+		for(String style: resultDto.getStyle()) {
+			StyleDto styleDto = StyleDto.builder().styleName(style).build();
+			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.styleService.findByName(styleDto);
+			if(genreResp.getStatusCode().is2xxSuccessful()) {
+				this.styleService.insert(styleDto);
+			}
+			
+			this.saveReleaseStyle(ReleaseMapper.INSTANCE.toDto(resultDto), styleDto);
+			
+		}
+		return null;
+	}
+	
+	public Object saveReleaseStyle(ReleaseDto releaseDto, StyleDto styleDto) {
+		ResponseEntity<ResponseWrapper<ReleaseStyleDto>> releaseGenreResp = this.releaseStyleService.findByReleaseAndStyle(releaseDto.getId(), styleDto.getId());
+		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
+			this.releaseStyleService.insert(ReleaseStyleDto.builder().release(releaseDto).style(styleDto).build());
+		}
+		return null;
 	}
 
 	

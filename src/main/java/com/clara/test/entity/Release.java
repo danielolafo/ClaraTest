@@ -81,23 +81,24 @@ public class Release {
     private Community community;
 
     @OneToMany(mappedBy = "release")
-    private Set<Style> releaseStyles;
-
-    @OneToMany(mappedBy = "release")
     private Set<Barcode> releaseBarcodes;
 
-    @OneToMany(mappedBy = "release")
-    private Set<Genre> releaseGenres;
 
     @OneToMany(mappedBy = "release")
     private Set<Format> releaseFormats;
-
-    @OneToMany(mappedBy = "release")
-    private Set<Label> releaseLabels;
 
     @OneToMany(mappedBy = "release")
     private Set<Track> releaseTracks;
 
     @OneToMany(mappedBy = "release")
     private Set<ArtistRelease> releaseArtistReleases;
+    
+    @OneToMany(mappedBy = "release")
+    private Set<ReleaseGenre> releaseReleaseGenres;
+    
+    @OneToMany(mappedBy = "release")
+    private Set<ReleaseLabel> releaseReleaseLabels;
+    
+    @OneToMany(mappedBy = "release")
+    private Set<ReleaseStyle> releaseReleaseStyles;
 }

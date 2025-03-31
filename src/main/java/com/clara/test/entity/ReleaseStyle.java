@@ -4,10 +4,12 @@ import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -18,9 +20,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name="STYLE")
-public class Style {
-
+@Table(name="RELEASE_STYLE")
+public class ReleaseStyle {
 	@Id
     @Column(nullable = false, updatable = false)
     @SequenceGenerator(
@@ -35,9 +36,11 @@ public class Style {
     )
     private Integer id;
 
-    @Column(nullable = false, length = 100)
-    private String styleName;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "release_id")
+    private Release release;
 
-    @OneToMany(mappedBy = "style")
-    private Set<ReleaseStyle> styleReleaseStyles;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "style_id", nullable = false)
+    private Style style;
 }

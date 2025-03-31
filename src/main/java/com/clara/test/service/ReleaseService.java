@@ -37,4 +37,6 @@ public interface ReleaseService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> save(List<ReleaseDto> lstReleaseDtos);
+	
+	public ResponseEntity<ResponseWrapper<ReleaseDto>> save(ReleaseDto releaseDto);
 }

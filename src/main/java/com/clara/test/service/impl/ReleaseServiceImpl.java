@@ -2,6 +2,7 @@ package com.clara.test.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -124,6 +125,26 @@ public class ReleaseServiceImpl implements ReleaseService {
 				.data(lstReleaseDtos)
 				.build(),
 				!lstReleaseDtos.isEmpty()?  HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<ReleaseDto>> save(ReleaseDto releaseDto) {
+		if(Objects.nonNull(releaseDto.getId())) {
+			//Throw exception
+		}
+		
+		Community community = releaseDto.getCommunity();
+		ResponseEntity<ResponseWrapper<List<CommunityDto>>> lstSavedCommunities = this.communityService.save(List.of(CommunityMapper.INSTANCE.toDto(community)));
+		Release release = ReleaseMapper.INSTANCE.toEntity(releaseDto);
+		release.setCommunity(CommunityMapper.INSTANCE.toEntity(lstSavedCommunities.getBody().getData().get(0)));
+		release.setId(null);
+		Integer id = this.repository.save(release).getId();
+		releaseDto.setId(id);
+		return new ResponseEntity<>(
+				ResponseWrapper.<ReleaseDto>builder()
+				.data(releaseDto)
+				.build(),
+				HttpStatus.OK);
 	}
 
 }
