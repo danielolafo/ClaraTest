@@ -242,22 +242,19 @@ public class DiscogServiceImpl implements DiscogService {
 					
 				}else {
 					//The artist exists in the database
-					
 					artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
-					//Gets the saved data from local database
-					//ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
 					
 					//Get Genres
 					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistResp.getBody().getData().getId().intValue());
 					
 					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
-					//lstResp.add(artistDto);
 				}
 				ResponseEntity<ResponseWrapper<List<LabelDto>>> labelsResp = this.labelService.getLabelFrequencyByArtis(artistDto.getId().intValue());
 				artistDto.setLstTags(labelsResp.getBody().getData().stream().map(lab -> lab.getLabelName()).collect(Collectors.toList()));
 				ResponseEntity<ResponseWrapper<List<StyleDto>>> styleResp =  this.styleService.getStyleFrequencyByArtist(artistDto.getId().intValue());
 				artistDto.setLstStyles(styleResp.getBody().getData().stream().map(style -> style.getStyleName()).collect(Collectors.toList()));
 				lstResp.add(artistDto);
+				
 				
 			}
 			
@@ -300,7 +297,6 @@ public class DiscogServiceImpl implements DiscogService {
 				genreDto = genreSaveResp.getBody().getData();
 			}
 			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(resultDto);
-			//releaseDto.setg
 			this.saveReleaseGenre(ReleaseMapper.INSTANCE.toDto(resultDto), genreDto);
 		}
 		return null;
@@ -404,38 +400,6 @@ public class DiscogServiceImpl implements DiscogService {
 		return null;
 	}
 	
-	
-	private void getCriteriaData(
-			ArtistDto artistDto,
-			String criteria) throws InvalidValueException, NotFoundException{
-		log.info("getCriteriaData");
-		CriteriaEnum criteriaEnum = CriteriaEnum.getEnum(criteria);
-		switch(criteriaEnum) {
-		case RELEASES:
-			log.info("Releases");
-			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releasesResp = this.releaseService.getReleasesByArtist(artistDto.getId().intValue());
-			artistDto.setReleases(releasesResp.getBody().getData());
-			break;
-		case RELEASE_YEAR:
-			log.info("ReleaseYear");
-			this.setYearsActive(artistDto);
-			break;
-		case GENRES:
-			log.info("Genres");
-			ResponseEntity<ResponseWrapper<List<GenreDto>>> genresResp = this.genreService.findByArtist(artistDto.getId().intValue());
-			artistDto.setLstGenres(genresResp.getBody().getData().stream().map(G -> G.getGenreName()).toList());
-			break;
-		case TAGS:
-			log.info("Tags");
-			//this.labelService.
-			break;
-		case STYLES:
-			log.info("Styles");
-			break;
-		default:
-			throw new InvalidValueException("Invalid criteria search for the comparisson"); 
-		}
-	}
 	
 	private void setYearsActive(ArtistDto artistDto) throws NotFoundException {
 		log.info("{} ArtistDto : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistDto);
