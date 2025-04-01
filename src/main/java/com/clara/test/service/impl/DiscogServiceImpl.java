@@ -132,6 +132,7 @@ public class DiscogServiceImpl implements DiscogService {
 			ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
 			artistResponseDto2.setReleasesUrl(artistResponseDto.getBody().getReleasesUrl());
 			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto.getBody());
+
 			
 			//Query artist by name in H2 database
 			artistResponseDto2.setName(artistRequestDto.getArtist());
@@ -199,6 +200,7 @@ public class DiscogServiceImpl implements DiscogService {
 					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistData.getBody().getData().getId().intValue());
 					artistDto = ArtistMapper.INSTANCE.toDto(artistData.getBody().getData());
 					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+					artistDto.setNumberOfReleases(respSaveArtist.getBody().getData().getPagination().getItems());
 					lstResp.add(artistDto);
 					
 				}else {

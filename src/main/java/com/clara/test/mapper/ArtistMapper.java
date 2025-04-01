@@ -22,6 +22,7 @@ public interface ArtistMapper {
 	@InheritInverseConfiguration
 	public ArtistResponseDto toDto(Artist artist);
 	
+	@Mapping(target="numberOfReleases", source="pagination.items")
 	public ArtistDto toDto(ArtistResponseDto artistResponseDto);
 
 }

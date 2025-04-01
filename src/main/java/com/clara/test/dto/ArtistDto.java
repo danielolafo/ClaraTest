@@ -50,4 +50,5 @@ public class ArtistDto {
 	private List<String> lstTags;
 	
 	private Integer yearsActive;
+	private Integer numberOfReleases;
 }

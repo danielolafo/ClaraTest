@@ -15,6 +15,9 @@ import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.utils.Webclient;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ReleaseWebClient {
 	
 	public static ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getArtistReleases(ArtistResponseDto artistResponseDto){
@@ -38,7 +41,7 @@ public class ReleaseWebClient {
 			paginationUrl = releaseCollectionDto.getPagination().getUrls().getNext();
 		}
 		
-		//ReleaseWebClient.saveAllReleases(artistResponseDto);
+		ReleaseWebClient.saveAllReleases(artistResponseDto);
 		
 		return new ResponseEntity<>(
 				ResponseWrapper.<List<ReleaseDto>>builder()
@@ -55,7 +58,8 @@ public class ReleaseWebClient {
 		List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
 		int count=0;
 		String paginationUrl = "";
-		while(Objects.nonNull(paginationUrl) || count<100) {
+		while(Objects.nonNull(paginationUrl)) {
+			log.info("Executing Discog API call");
 			paginationUrl = new StringBuilder().append(artistResponseDto.getReleasesUrl()).append("?page=").append(page).append("&per_page=").append(perPage).toString();
 			webClient = Webclient.getClient(paginationUrl);
 			ReleaseCollectionDto releaseCollectionDto = webClient.get().exchange().block().bodyToMono(ReleaseCollectionDto.class).block();
@@ -66,6 +70,7 @@ public class ReleaseWebClient {
 				page++;
 				paginationUrl = releaseCollectionDto.getPagination().getUrls().getNext();
 			}
+			paginationUrl = null;
 			
 		}
 		return null;
