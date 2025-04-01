@@ -220,6 +220,7 @@ public class DiscogServiceImpl implements DiscogService {
 			}
 			
 			ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();
+			this.setLightweightDto(artistComparissonResponseDto);
 			return new ResponseEntity<>(
 					ResponseWrapper.<ArtistComparissonResponseDto>builder()
 					.data(artistComparissonResponseDto)
@@ -232,7 +233,7 @@ public class DiscogServiceImpl implements DiscogService {
 					ResponseWrapper.<ArtistComparissonResponseDto>builder()
 					.data(ArtistComparissonResponseDto.builder().build())
 					.message(HttpStatus.BAD_REQUEST.getReasonPhrase())
-					.status(HttpStatus.OK)
+					.status(HttpStatus.BAD_REQUEST)
 					.build(),
 					HttpStatus.BAD_REQUEST);
 		}
@@ -396,6 +397,21 @@ public class DiscogServiceImpl implements DiscogService {
 		
 		List<Integer> years = lstReleaseYearsResp.getBody().getData();
 		artistDto.setYearsActive(years.get(years.size()-1)-years.get(0));
+	}
+	
+	public void setLightweightDto(ArtistComparissonResponseDto artistComparissonResponseDto) {
+		List<ArtistDto> lstArtists = new ArrayList<>();
+		for(ArtistDto artistDto : artistComparissonResponseDto.getArtists()) {
+			ArtistDto lightweightArtistDto = ArtistDto.builder()
+					.id(artistDto.getId())
+					.lstGenres(artistDto.getLstGenres())
+					.lstTags(artistDto.getLstTags())
+					.name(artistDto.getName())
+					.numberOfReleases(artistDto.getNumberOfReleases())
+					.build();
+			lstArtists.add(lightweightArtistDto);
+		}
+		artistComparissonResponseDto.setArtists(lstArtists);
 	}
 
 	
