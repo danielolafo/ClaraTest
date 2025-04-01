@@ -29,6 +29,7 @@ public enum CriteriaEnum {
 			if(enums[idx].getName().equals(value)) {
 				resp = enums[idx];
 			}
+			idx++;
 		}
 		if(Objects.isNull(resp)) {
 			throw new NotFoundException("Criteria not found");

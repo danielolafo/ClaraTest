@@ -114,65 +114,68 @@ public class DiscogServiceImpl implements DiscogService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> getArtist(
-			ArtistRequestDto artistRequestDto) {
-		ResponseEntity<ArtistDiscogResponseDto> discogResp =discogFeign.getArtist(artistRequestDto.getArtist(), artistRequestDto.getTitle(), artistRequestDto.getReleaseTitle(), artistRequestDto.getToken());
-		
-		//Get the mastersId field
-		Integer masterId = discogResp.getBody().getResults().get(0).getMasterId();
-		ResponseEntity<MasterResponseDto> masterResponse = discogFeign.getMaster(masterId);
-		
-		//Extract and get the artist
-		ResponseEntity<ArtistResponseDto> artistResponseDto = discogFeign.getArtistById(masterResponse.getBody().getArtists().get(0).getId());
-		
-//		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.insert(artistResponseDto.getBody());
-		
-		//Save albums/releases
-		WebClient webClient = Webclient.getClient(artistResponseDto.getBody().getReleasesUrl());
-		ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
-		artistResponseDto2.setReleasesUrl(artistResponseDto.getBody().getReleasesUrl());
-		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto.getBody());
-		
-		//Query artist by name in H2 database
-		artistResponseDto2.setName(artistRequestDto.getArtist());
-		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
-		Integer newArtistId = null;
-		if(!artistQueryResp.getStatusCode().is2xxSuccessful()) {
-			newArtistId = this.artistService.insert(artistResponseDto.getBody()).getBody().getData().getId().intValue();
-		}else {
-			newArtistId = artistQueryResp.getBody().getData().getId().intValue();
+			ArtistRequestDto artistRequestDto) throws InvalidValueException {
+		try {
+			ResponseEntity<ArtistDiscogResponseDto> discogResp =discogFeign.getArtist(artistRequestDto.getArtist(), artistRequestDto.getTitle(), artistRequestDto.getReleaseTitle(), artistRequestDto.getToken());
+			
+			//Get the mastersId field
+			Integer masterId = discogResp.getBody().getResults().get(0).getMasterId();
+			ResponseEntity<MasterResponseDto> masterResponse = discogFeign.getMaster(masterId);
+			
+			//Extract and get the artist
+			ResponseEntity<ArtistResponseDto> artistResponseDto = discogFeign.getArtistById(masterResponse.getBody().getArtists().get(0).getId());
+			
+//			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.insert(artistResponseDto.getBody());
+			
+			//Save albums/releases
+			WebClient webClient = Webclient.getClient(artistResponseDto.getBody().getReleasesUrl());
+			ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
+			artistResponseDto2.setReleasesUrl(artistResponseDto.getBody().getReleasesUrl());
+			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releases = ReleaseWebClient.getArtistReleases(artistResponseDto.getBody());
+			
+			//Query artist by name in H2 database
+			artistResponseDto2.setName(artistRequestDto.getArtist());
+			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistQueryResp = this.artistService.findByName(artistResponseDto2);
+			Integer newArtistId = null;
+			if(!artistQueryResp.getStatusCode().is2xxSuccessful()) {
+				newArtistId = this.artistService.insert(artistResponseDto.getBody()).getBody().getData().getId().intValue();
+			}else {
+				newArtistId = artistQueryResp.getBody().getData().getId().intValue();
+			}
+			
+			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> savedReleases = new ResponseEntity<>(
+					ResponseWrapper.<List<ReleaseDto>>builder()
+					.data(new ArrayList<>())
+					.message("No results found")
+					.status(HttpStatus.OK)
+					.build(),
+					HttpStatus.NOT_FOUND);
+			
+			//Save discography
+			List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
+			final Integer artistId = newArtistId;
+			discogResp.getBody().getResults().forEach(res-> {
+				ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(res);
+				releaseDto.setArtistId(artistId);
+				lstReleaseDtos.add(releaseDto);
+				Integer releaseId = this.releaseService.save(releaseDto).getBody().getData().getId();
+				res.setId(releaseId);
+				this.setGenres(res);
+				this.setLabels(res);
+				this.setStyles(res);
+			});
+			
+			
+			return new ResponseEntity<>(
+					ResponseWrapper.<ArtistDiscogResponseDto>builder()
+					.data(discogResp.getBody())
+					.message(discogResp.getStatusCode().is2xxSuccessful() ? "OK" : "No results found")
+					.status(HttpStatus.valueOf(discogResp.getStatusCodeValue()))
+					.build(),
+					discogResp.getStatusCode());
+		}catch(Exception ex) {
+			throw new InvalidValueException("The artist could not be retrieved");
 		}
-		
-		ResponseEntity<ResponseWrapper<List<ReleaseDto>>> savedReleases = new ResponseEntity<>(
-				ResponseWrapper.<List<ReleaseDto>>builder()
-				.data(new ArrayList<>())
-				.message("No results found")
-				.status(HttpStatus.OK)
-				.build(),
-				HttpStatus.NOT_FOUND);
-		
-		//Save discography
-		List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
-		final Integer artistId = newArtistId;
-		discogResp.getBody().getResults().forEach(res-> {
-			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(res);
-			releaseDto.setArtistId(artistId);
-			lstReleaseDtos.add(releaseDto);
-			Integer releaseId = this.releaseService.save(releaseDto).getBody().getData().getId();
-			res.setId(releaseId);
-			this.setGenres(res);
-			this.setLabels(res);
-			this.setStyles(res);
-		});
-		//this.releaseService.save(lstReleaseDtos);
-		
-		
-		return new ResponseEntity<>(
-				ResponseWrapper.<ArtistDiscogResponseDto>builder()
-				.data(discogResp.getBody())
-				.message(discogResp.getStatusCode().is2xxSuccessful() ? "OK" : "No results found")
-				.status(HttpStatus.valueOf(discogResp.getStatusCodeValue()))
-				.build(),
-				discogResp.getStatusCode());
 	}
 
 	@Override
@@ -194,7 +197,7 @@ public class DiscogServiceImpl implements DiscogService {
 					//Get Genres
 //					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.findByArtist(artistData.getBody().getData().getId().intValue());
 					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistData.getBody().getData().getId().intValue());
-					artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
+					artistDto = ArtistMapper.INSTANCE.toDto(artistData.getBody().getData());
 					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
 					lstResp.add(artistDto);
 					
@@ -211,7 +214,7 @@ public class DiscogServiceImpl implements DiscogService {
 				}
 				
 				//Set criteria data
-				//this.getCriteriaData(artistDto, artistComparissonRequestDto.getCriteria());
+				this.getCriteriaData(artistDto, artistComparissonRequestDto.getCriteria());
 			}
 			
 			ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();
@@ -357,17 +360,26 @@ public class DiscogServiceImpl implements DiscogService {
 		CriteriaEnum criteriaEnum = CriteriaEnum.getEnum(criteria);
 		switch(criteriaEnum) {
 		case RELEASES:
+			log.info("Releases");
 			ResponseEntity<ResponseWrapper<List<ReleaseDto>>> releasesResp = this.releaseService.getReleasesByArtist(artistDto.getId().intValue());
 			artistDto.setReleases(releasesResp.getBody().getData());
+			break;
 		case RELEASE_YEAR:
+			log.info("ReleaseYear");
 			this.setYearsActive(artistDto);
+			break;
 		case GENRES:
+			log.info("Genres");
 			ResponseEntity<ResponseWrapper<List<GenreDto>>> genresResp = this.genreService.findByArtist(artistDto.getId().intValue());
 			artistDto.setLstGenres(genresResp.getBody().getData().stream().map(G -> G.getGenreName()).toList());
+			break;
 		case TAGS:
+			log.info("Tags");
 			//this.labelService.
+			break;
 		case STYLES:
-			
+			log.info("Styles");
+			break;
 		default:
 			throw new InvalidValueException("Invalid criteria search for the comparisson"); 
 		}
@@ -381,7 +393,7 @@ public class DiscogServiceImpl implements DiscogService {
 		}
 		
 		List<Integer> years = lstReleaseYearsResp.getBody().getData();
-		artistDto.setYearsActive(years.get(years.size())-years.get(0));
+		artistDto.setYearsActive(years.get(years.size()-1)-years.get(0));
 	}
 
 	

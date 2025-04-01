@@ -14,6 +14,7 @@ import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.exception.InvalidValueException;
 import com.clara.test.service.DiscogService;
 
 import io.micrometer.common.lang.NonNull;
@@ -35,7 +36,7 @@ public class ArtistController {
 			@RequestParam(value="title", required=false) String title,
 			@RequestParam(value="release_title", required=false) String releaseTitle,
 			@RequestParam("token") String token,
-			@ModelAttribute ArtistRequestDto artistRequestDto){
+			@ModelAttribute ArtistRequestDto artistRequestDto) throws InvalidValueException{
 		
 		return discogService.getArtist(artistRequestDto);
 	}
