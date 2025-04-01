@@ -3,6 +3,7 @@ package com.clara.test.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clara.test.dto.ArtistComparissonRequestDto;
 import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
+import com.clara.test.dto.ArtistDto;
 import com.clara.test.dto.ArtistRequestDto;
+import com.clara.test.dto.DiscographyRequestDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.exception.DatabaseException;
 import com.clara.test.exception.InvalidValueException;
 import com.clara.test.service.DiscogService;
 
@@ -36,7 +40,7 @@ public class ArtistController {
 			@RequestParam(value="title", required=false) String title,
 			@RequestParam(value="release_title", required=false) String releaseTitle,
 			@RequestParam("token") String token,
-			@ModelAttribute ArtistRequestDto artistRequestDto) throws InvalidValueException{
+			@ModelAttribute ArtistRequestDto artistRequestDto) throws InvalidValueException, DatabaseException{
 		
 		return discogService.getArtist(artistRequestDto);
 	}
@@ -47,6 +51,15 @@ public class ArtistController {
 			@RequestBody ArtistComparissonRequestDto artistRequestDto){
 		
 		return discogService.compareArtists(artistRequestDto);
+	}
+	
+	@GetMapping("/get-discography/{artistId}")
+	public ResponseEntity<ResponseWrapper<ArtistDto>> getDiscography(
+			@PathVariable("artistId") Integer artistId,
+			@RequestParam("page") Integer page,
+			@RequestParam("pageSize") Integer pageSize,
+			@ModelAttribute DiscographyRequestDto discographyRequestDto){
+		return this.discogService.getDiscography(discographyRequestDto);
 	}
 
 }

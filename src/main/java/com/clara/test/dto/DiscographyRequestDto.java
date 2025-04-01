@@ -1,7 +1,5 @@
 package com.clara.test.dto;
 
-import java.util.Set;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,12 +11,10 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class LabelDto {
-	private Integer id;
+public class DiscographyRequestDto {
+	
+	private Integer artistId;
+	private Integer page;
+	private Integer pageSize;
 
-    private String labelName;
-    
-    private Integer frequency;
-    
-    //private Set<ReleaseLabelDto> labelReleaseLabels;
 }

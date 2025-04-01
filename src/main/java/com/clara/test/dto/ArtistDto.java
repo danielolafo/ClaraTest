@@ -51,6 +51,9 @@ public class ArtistDto {
 	@JsonProperty("tags")
 	private List<String> lstTags;
 	
+	@JsonProperty("styles")
+	private List<String> lstStyles;
+	
 	private Integer yearsActive;
 	private Integer numberOfReleases;
 }

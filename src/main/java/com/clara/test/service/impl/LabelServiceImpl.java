@@ -1,5 +1,6 @@
 package com.clara.test.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.ResponseWrapper;
+import com.clara.test.dto.StyleDto;
 import com.clara.test.entity.Label;
 import com.clara.test.mapper.LabelMapper;
 import com.clara.test.repository.LabelRepository;
@@ -65,8 +67,13 @@ public class LabelServiceImpl implements LabelService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<LabelDto>>> getLabelFrequencyByArtis(Integer artistId) {
-		// TODO Auto-generated method stub
-		return null;
+		List<LabelDto> lstResp = new ArrayList<>();
+		this.repository.getFrequencyByArtist(artistId).forEach(label -> lstResp.add(LabelDto.builder().labelName(label.getLabelName()).frequency(label.getFrequency()).build()));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<LabelDto>>builder()
+				.data(lstResp)
+				.build(),
+				!lstResp.isEmpty() ? HttpStatus.OK : HttpStatus.NOT_FOUND);
 	}
 
 }

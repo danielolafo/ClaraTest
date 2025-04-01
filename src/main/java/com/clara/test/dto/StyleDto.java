@@ -19,4 +19,6 @@ public class StyleDto {
     private String styleName;
 
     private Set<ReleaseStyleDto> styleReleaseStyles;
+    
+    private Integer frequency;
 }

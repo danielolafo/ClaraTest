@@ -1,11 +1,14 @@
 package com.clara.test.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.clara.test.dto.GenreDto;
 import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.dto.StyleDto;
@@ -64,5 +67,18 @@ public class StyleServiceImpl implements StyleService {
 				.build(),
 				HttpStatus.OK);
 	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<StyleDto>>> getStyleFrequencyByArtist(Integer artistId) {
+		List<StyleDto> lstResp = new ArrayList<>();
+		this.repository.getStyleFrequencyByArtist(artistId).forEach(style -> lstResp.add(StyleDto.builder().styleName(style.getStyleName()).frequency(style.getFrequency()).build()));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<StyleDto>>builder()
+				.data(lstResp)
+				.build(),
+				!lstResp.isEmpty() ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+	}
+
+
 
 }

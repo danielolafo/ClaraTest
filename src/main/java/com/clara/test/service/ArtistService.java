@@ -31,6 +31,14 @@ public interface ArtistService {
 	 */
 	public ResponseEntity<ResponseWrapper<ArtistResponseDto>> findByName(ArtistResponseDto artistResponseDto);
 	
+	
+	/**
+	 * 
+	 * @param artistId
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public ResponseEntity<ResponseWrapper<ArtistResponseDto>> findById(Integer artistId);
+	
 
 }

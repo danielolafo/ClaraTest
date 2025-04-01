@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
+import com.clara.test.dto.DiscographyRequestDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 
@@ -39,4 +40,13 @@ public interface ReleaseService {
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> save(List<ReleaseDto> lstReleaseDtos);
 	
 	public ResponseEntity<ResponseWrapper<ReleaseDto>> save(ReleaseDto releaseDto);
+	
+	
+	/**
+	 * 
+	 * @param discographyRequestDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
+	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getDiscography(DiscographyRequestDto discographyRequestDto);
 }

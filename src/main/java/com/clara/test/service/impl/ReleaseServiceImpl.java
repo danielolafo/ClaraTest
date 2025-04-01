@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.hibernate.query.SortDirection;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.clara.test.dto.ArtistReleaseDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.CommunityDto;
+import com.clara.test.dto.DiscographyRequestDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.entity.Community;
@@ -154,6 +158,18 @@ public class ReleaseServiceImpl implements ReleaseService {
 				.data(releaseDto)
 				.build(),
 				HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getDiscography(DiscographyRequestDto discographyRequestDto) {
+		List<ReleaseDto> lstResp = new ArrayList<>();
+		PageRequest page = PageRequest.of(discographyRequestDto.getPage(), discographyRequestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "releaseYear"));
+		this.repository.getAllByArtist(discographyRequestDto.getArtistId(), page).forEach(rel -> lstResp.add(ReleaseMapper.INSTANCE.toDto(rel)));
+		return new ResponseEntity<>(
+				ResponseWrapper.<List<ReleaseDto>>builder()
+				.data(lstResp)
+				.build(),
+				!lstResp.isEmpty()? HttpStatus.OK: HttpStatus.NOT_FOUND);
 	}
 
 }
