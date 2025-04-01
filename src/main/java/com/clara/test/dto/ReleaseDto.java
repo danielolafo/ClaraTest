@@ -10,6 +10,7 @@ import com.clara.test.entity.Genre;
 import com.clara.test.entity.Label;
 import com.clara.test.entity.Style;
 import com.clara.test.entity.Track;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Getter;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReleaseDto {
 	private Integer id;
 

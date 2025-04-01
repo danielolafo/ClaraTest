@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.clara.test.entity.Release;
@@ -40,6 +41,6 @@ public interface ReleaseRepository extends JpaRepository<Release, Integer> {
 			ON r.id = ar.release.id
 			WHERE ar.artist.id = :artistId
 			""")
-	public List<Release> getAllByArtist(Integer artistId, Pageable pageable);
+	public List<Release> getAllByArtist(@Param("artistId") Integer artistId, Pageable pageable);
 
 }

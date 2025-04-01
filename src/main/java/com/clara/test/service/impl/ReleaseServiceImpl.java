@@ -163,8 +163,14 @@ public class ReleaseServiceImpl implements ReleaseService {
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getDiscography(DiscographyRequestDto discographyRequestDto) {
 		List<ReleaseDto> lstResp = new ArrayList<>();
-		PageRequest page = PageRequest.of(discographyRequestDto.getPage(), discographyRequestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "releaseYear"));
-		this.repository.getAllByArtist(discographyRequestDto.getArtistId(), page).forEach(rel -> lstResp.add(ReleaseMapper.INSTANCE.toDto(rel)));
+		PageRequest page = PageRequest.of(discographyRequestDto.getPage()-1, discographyRequestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "releaseYear"));
+		this.repository.getAllByArtist(discographyRequestDto.getArtistId(), page)
+		.forEach(rel -> {
+			ReleaseDto releaseDto = ReleaseMapper.INSTANCE.toDto(rel);
+			releaseDto.setCommunity(null);
+			releaseDto.setReleaseArtistReleases(null);
+			lstResp.add(releaseDto);
+		});
 		return new ResponseEntity<>(
 				ResponseWrapper.<List<ReleaseDto>>builder()
 				.data(lstResp)
