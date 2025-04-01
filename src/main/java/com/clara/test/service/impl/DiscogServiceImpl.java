@@ -245,10 +245,10 @@ public class DiscogServiceImpl implements DiscogService {
 					
 					artistDto = ArtistMapper.INSTANCE.toDto(artistResp.getBody().getData());
 					//Gets the saved data from local database
-					ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
+					//ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistData = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
 					
 					//Get Genres
-					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistData.getBody().getData().getId().intValue());
+					ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos = this.genreService.getGenreFrequencyByArtis(artistResp.getBody().getData().getId().intValue());
 					
 					artistDto.setLstGenres(lstRespGenresDtos.getBody().getData().stream().map(G -> G.getGenreName()).toList());
 					//lstResp.add(artistDto);
@@ -259,8 +259,6 @@ public class DiscogServiceImpl implements DiscogService {
 				artistDto.setLstStyles(styleResp.getBody().getData().stream().map(style -> style.getStyleName()).collect(Collectors.toList()));
 				lstResp.add(artistDto);
 				
-				//Set criteria data
-				this.getCriteriaData(artistDto, artistComparissonRequestDto.getCriteria());
 			}
 			
 			ArtistComparissonResponseDto artistComparissonResponseDto = ArtistComparissonResponseDto.builder().artists(lstResp).build();

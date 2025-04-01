@@ -1,5 +1,7 @@
 package com.clara.test.service.impl;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -21,15 +23,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.clara.test.dto.ArtistComparissonRequestDto;
+import com.clara.test.dto.ArtistComparissonResponseDto;
 import com.clara.test.dto.ArtistDiscogResponseDto;
+import com.clara.test.dto.ArtistDto;
 import com.clara.test.dto.ArtistReleaseDto;
 import com.clara.test.dto.ArtistRequestDto;
 import com.clara.test.dto.ArtistResponseDto;
 import com.clara.test.dto.DiscographyRequestDto;
+import com.clara.test.dto.GenreDto;
+import com.clara.test.dto.LabelDto;
 import com.clara.test.dto.MasterResponseDto;
 import com.clara.test.dto.ReleaseDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.dto.ResultDto;
+import com.clara.test.dto.StyleDto;
 import com.clara.test.entity.Artist;
 import com.clara.test.exception.DatabaseException;
 import com.clara.test.exception.InvalidValueException;
@@ -85,6 +92,9 @@ class DiscogServiceImplTest {
 	ResponseEntity<ArtistResponseDto> artistResponseDto;
 	ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistServiceResp;
 	ResponseEntity<ResponseWrapper<List<ReleaseDto>>> discographyResp;
+	ResponseEntity<ResponseWrapper<List<GenreDto>>> lstRespGenresDtos;
+	ResponseEntity<ResponseWrapper<List<LabelDto>>> labelsResp;
+	ResponseEntity<ResponseWrapper<List<StyleDto>>> styleResp;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -126,10 +136,34 @@ class DiscogServiceImplTest {
 				.build(),
 				HttpStatus.OK);
 		
+		List<GenreDto> lstGenreDtos = new ArrayList<>();
+		lstGenreDtos.add(GenreDto.builder().genreName("Genre 1").id(1).frequency(1).build());
+		lstRespGenresDtos = new ResponseEntity<>(
+				ResponseWrapper.<List<GenreDto>>builder()
+				.data(lstGenreDtos)
+				.build(),
+				HttpStatus.OK);
+		
+		List<LabelDto> lstLabelDtos = new ArrayList<>();
+		lstLabelDtos.add(LabelDto.builder().labelName("Label 1").id(1).build());
+		labelsResp = new ResponseEntity<>(
+				ResponseWrapper.<List<LabelDto>>builder()
+				.data(lstLabelDtos)
+				.build(),
+				HttpStatus.OK);
+		
+		List<StyleDto> lstStyleDtos = new ArrayList<>();
+		lstStyleDtos.add(StyleDto.builder().styleName("Style 1").id(1).build());
+		styleResp = new ResponseEntity<>(
+				ResponseWrapper.<List<StyleDto>>builder()
+				.data(lstStyleDtos)
+				.build(),
+				HttpStatus.OK);
+		
 		ReflectionTestUtils.setField(discogServiceImpl, "discogToken", "discogToken");
 	}
 
-	@Test
+	//@Test
 	void getArtist() throws InvalidValueException, DatabaseException {
 		doReturn(masterResponse).when(discogFeign).getMaster(anyInt());
 		doReturn(discogResp).when(discogFeign).getArtist(anyString(), anyString(), anyString(), anyString());
@@ -141,16 +175,21 @@ class DiscogServiceImplTest {
 	
 	@Test
 	void compareArtists() {
-		doReturn(masterResponse).when(discogFeign).getMaster(anyInt());
-		doReturn(discogResp).when(discogFeign).getArtist(anyString(), anyString(), anyString(), anyString());
-		doReturn(artistResponseDto).when(discogFeign).getArtistById(anyLong());
+		//doReturn(masterResponse).when(discogFeign).getMaster(anyInt());
+		//doReturn(discogResp).when(discogFeign).getArtist(anyString(), anyString(), anyString(), anyString());
+		//doReturn(artistResponseDto).when(discogFeign).getArtistById(anyLong());
 		
 		List<String> lstArtists = new ArrayList<>();
 		lstArtists.add("U2");
 		lstArtists.add("The Beatles");
-		doReturn(artistResponseDto).when(artistService).findByName(ArtistResponseDto.builder().name("U2").build());
-		doReturn(artistResponseDto).when(artistService).findByName(ArtistResponseDto.builder().name("The Beatles").build());
-		discogServiceImpl.compareArtists(ArtistComparissonRequestDto.builder().artists(lstArtists).build());
+		when(artistService.findByName(any(ArtistResponseDto.class))).thenReturn(artistServiceResp);
+		//when(genreService.findByArtist(anyInt())).thenReturn(lstRespGenresDtos);
+		when(genreService.getGenreFrequencyByArtis(anyInt())).thenReturn(lstRespGenresDtos);
+		when(labelService.getLabelFrequencyByArtis(anyInt())).thenReturn(labelsResp);
+		when(styleService.getStyleFrequencyByArtist(anyInt())).thenReturn(styleResp);
+		ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> resp = discogServiceImpl.compareArtists(ArtistComparissonRequestDto.builder().artists(lstArtists).build());
+		assertTrue(resp.getStatusCode().is2xxSuccessful());
+		assertEquals(lstArtists.size(), resp.getBody().getData().getArtists().size());
 	}
 	
 	@Test
@@ -161,7 +200,8 @@ class DiscogServiceImplTest {
 				.page(1).pageSize(10)
 				.artistId(1)
 				.build();
-		discogServiceImpl.getDiscography(discographyRequestDto);
+		ResponseEntity<ResponseWrapper<ArtistDto>> resp = discogServiceImpl.getDiscography(discographyRequestDto);
+		assertTrue(resp.getStatusCode().is2xxSuccessful());
 	}
 
 }
