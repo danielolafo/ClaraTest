@@ -14,7 +14,9 @@ import com.clara.test.repository.ReleaseLabelRepository;
 import com.clara.test.service.ReleaseLabelService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 @Service
+@Slf4j
 public class ReleaseLabelServiceImpl implements ReleaseLabelService{
 	
 	@NonNull
@@ -26,6 +28,7 @@ public class ReleaseLabelServiceImpl implements ReleaseLabelService{
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseLabelDto>> insert(ReleaseLabelDto releaseLabelDto) {
+		log.info("{} releaseLabelDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseLabelDto);
 		Optional<ReleaseLabel> releaseLabelOpt = this.repository.findByReleaseAndLabel(releaseLabelDto.getRelease().getId(), releaseLabelDto.getLabel().getId());
 		if(releaseLabelOpt.isPresent()) {
 			return new ResponseEntity<>(
@@ -44,6 +47,7 @@ public class ReleaseLabelServiceImpl implements ReleaseLabelService{
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseLabelDto>> findByReleaseAndLabel(Integer releaseId, Integer labelId) {
+		log.info("{} releaseId: {}, labelId: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), releaseId, labelId);
 		Optional<ReleaseLabel> releaseLabelOpt = this.repository.findByReleaseAndLabel(releaseId, labelId);
 		if(releaseLabelOpt.isEmpty()) {
 			return new ResponseEntity<>(

@@ -14,7 +14,9 @@ import com.clara.test.repository.ReleaseGenreRepository;
 import com.clara.test.service.ReleaseGenreService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 @Service
+@Slf4j
 public class ReleaseGenreServiceImpl implements ReleaseGenreService {
 	
 	@NonNull
@@ -26,6 +28,7 @@ public class ReleaseGenreServiceImpl implements ReleaseGenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseGenreDto>> insert(ReleaseGenreDto releaseGenreDto) {
+		log.info("{} releaseGenreDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseGenreDto);
 		Optional<ReleaseGenre> releaseGenreOpt = this.repository.findByGenreAndRelease(releaseGenreDto.getRelease().getId(), releaseGenreDto.getGenre().getId());
 		if(releaseGenreOpt.isPresent()) {
 			//Throw exception
@@ -40,6 +43,7 @@ public class ReleaseGenreServiceImpl implements ReleaseGenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseGenreDto>> findByReleaseAndGenre(Integer releaseId, Integer genreIds) {
+		log.info("{} releaseId: {}, genreIds: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseId, genreIds);
 		Optional<ReleaseGenre> releaseGenreOpt = this.repository.findByGenreAndRelease(releaseId, genreIds);
 		if(releaseGenreOpt.isEmpty()) {
 			return new ResponseEntity<>(

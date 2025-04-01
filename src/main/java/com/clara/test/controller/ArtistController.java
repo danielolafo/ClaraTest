@@ -39,7 +39,6 @@ public class ArtistController {
 			@RequestParam(value="artist", required=false) String artist,
 			@RequestParam(value="title", required=false) String title,
 			@RequestParam(value="release_title", required=false) String releaseTitle,
-			@RequestParam("token") String token,
 			@ModelAttribute ArtistRequestDto artistRequestDto) throws InvalidValueException, DatabaseException{
 		
 		return discogService.getArtist(artistRequestDto);

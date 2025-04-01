@@ -11,12 +11,9 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
-public class LabelDto {
-	private Integer id;
+public class ValidationDto {
 
-    private String labelName;
-    
-    private Integer frequency;
-    
-    //private Set<ReleaseLabelDto> labelReleaseLabels;
+	private boolean isValid;
+	private String message;
+	
 }

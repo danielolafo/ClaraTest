@@ -48,6 +48,7 @@ public class ArtistReleaseServiceImpl implements ArtistReleaseService {
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ArtistReleaseDto>>> findByNameAndTitle(
 			ArtistReleaseDto artistReleaseDto) {
+		log.info("{} artistReleaseDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),artistReleaseDto);
 		List<ArtistReleaseDto> lstResp = new ArrayList<>();
 		Optional<ArtistRelease> artistReleaseOpt = this.repository.findByArtistNameAndReleaseTitle(artistReleaseDto.getArtist(), artistReleaseDto.getTitle());
 		if(artistReleaseOpt.isPresent()) {
@@ -65,6 +66,7 @@ public class ArtistReleaseServiceImpl implements ArtistReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistReleaseDto>> insert(ArtistReleaseDto artistReleaseDto) {
+		log.info("{} artistReleaseDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),artistReleaseDto);
 		ArtistRelease artistRelease = ArtistReleaseMapper.INSTANCE.toEntity(artistReleaseDto);
 		artistRelease.setArtist(ArtistMapper.INSTANCE.toArtist(artistReleaseDto.getArtistResponseDto()));
 		artistRelease = this.repository.save(artistRelease);

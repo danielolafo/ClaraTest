@@ -14,7 +14,9 @@ import com.clara.test.repository.ReleaseStyleRepository;
 import com.clara.test.service.ReleaseStyleService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 @Service
+@Slf4j
 public class ReleaseStyleServiceImpl implements ReleaseStyleService {
 	
 	@NonNull
@@ -26,6 +28,7 @@ public class ReleaseStyleServiceImpl implements ReleaseStyleService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseStyleDto>> insert(ReleaseStyleDto releaseStyleDto) {
+		log.info("{} releaseStyleDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseStyleDto);
 		Optional<ReleaseStyle> releaseStyleOpt = this.repository.findByReleaseAndStyle(releaseStyleDto.getRelease().getId(), releaseStyleDto.getStyle().getId());
 		if(releaseStyleOpt.isPresent()) {
 			return new ResponseEntity<>(
@@ -44,6 +47,7 @@ public class ReleaseStyleServiceImpl implements ReleaseStyleService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseStyleDto>> findByReleaseAndStyle(Integer releaseId, Integer styleId) {
+		log.info("{} releaseId: {}, styleId: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseId, styleId);
 		Optional<ReleaseStyle> releaseStyleOpt = this.repository.findByReleaseAndStyle(releaseId, styleId);
 		if(releaseStyleOpt.isEmpty()) {
 			return new ResponseEntity<>(

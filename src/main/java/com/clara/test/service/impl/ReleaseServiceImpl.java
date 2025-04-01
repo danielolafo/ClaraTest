@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.hibernate.query.SortDirection;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -29,8 +28,10 @@ import com.clara.test.service.CommunityService;
 import com.clara.test.service.ReleaseService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class ReleaseServiceImpl implements ReleaseService {
 	
 	@NonNull
@@ -58,6 +59,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseDto>> insert(ReleaseDto releaseDto) {
+		log.info("{} releaseDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), releaseDto);
 		Release release = ReleaseMapper.INSTANCE.toEntity(releaseDto);
 		release.setId(null);
 		this.repository.save(release);
@@ -71,6 +73,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> insert(List<ReleaseDto> lstReleaseDtos) {
+		log.info("{} lstReleaseDtos: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),lstReleaseDtos);
 		for(ReleaseDto releaseDto : lstReleaseDtos) {
 			releaseDto.setId(null);
 			ResponseEntity<ResponseWrapper<ReleaseDto>> resp = this.insert(releaseDto);
@@ -85,7 +88,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId) {
-		//ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(artistId);
+		log.info("{} artistId: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),artistId);
 		List<ReleaseDto> lstReleaseDtos = new ArrayList<>();
 		this.repository.findByArtist(artistId).forEach(rel -> lstReleaseDtos.add(ReleaseMapper.INSTANCE.toDto(rel)));
 		return new ResponseEntity<>(
@@ -97,6 +100,8 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> save(List<ReleaseDto> lstReleaseDtos) {
+		log.info("{} lstReleaseDtos: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), lstReleaseDtos);
+		
 		//Get the artist info 
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(lstReleaseDtos.get(0).getArtistId());
 		List<Release> lstCurrentReleases = this.repository.findByArtist(artistResp.getBody().getData().getId().intValue());
@@ -133,6 +138,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ReleaseDto>> save(ReleaseDto releaseDto) {
+		log.info("{} releaseDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), releaseDto);
 		if(Objects.nonNull(releaseDto.getId())) {
 			//Throw exception
 		}
@@ -162,6 +168,7 @@ public class ReleaseServiceImpl implements ReleaseService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getDiscography(DiscographyRequestDto discographyRequestDto) {
+		log.info("{} discographyRequestDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), discographyRequestDto);
 		List<ReleaseDto> lstResp = new ArrayList<>();
 		PageRequest page = PageRequest.of(discographyRequestDto.getPage()-1, discographyRequestDto.getPageSize(), Sort.by(Sort.Direction.ASC, "releaseYear"));
 		this.repository.getAllByArtist(discographyRequestDto.getArtistId(), page)

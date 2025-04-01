@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.ls.LSException;
 
 import com.clara.test.dto.GenreDto;
 import com.clara.test.dto.ResponseWrapper;
@@ -17,8 +16,10 @@ import com.clara.test.repository.GenreRepository;
 import com.clara.test.service.GenreService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class GenreServiceImpl implements GenreService {
 	
 	@NonNull
@@ -30,6 +31,7 @@ public class GenreServiceImpl implements GenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<GenreDto>> insert(GenreDto genreDto) {
+		log.info("{} genreDto : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), genreDto);
 		Optional<Genre> genreOpt = this.repository.findByGenreName(genreDto.getGenreName());
 		
 		if(genreOpt.isPresent()) {
@@ -46,6 +48,7 @@ public class GenreServiceImpl implements GenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<GenreDto>> findByName(GenreDto genreDto) {
+		log.info("{} genreDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), genreDto);
 		Optional<Genre> genreOpt = this.repository.findByGenreName(genreDto.getGenreName());
 		
 		if(genreOpt.isEmpty()) {
@@ -65,6 +68,7 @@ public class GenreServiceImpl implements GenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<GenreDto>>> findByArtist(Integer artistId) {
+		log.info("{}  artistId : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistId);
 		List<GenreDto> lstGenreDto = new ArrayList<>();
 		this.repository.findByArtist(artistId).forEach(gen -> lstGenreDto.add(GenreMapper.INSTANCE.toDto(gen)));
 		if(lstGenreDto.isEmpty()) {
@@ -83,6 +87,7 @@ public class GenreServiceImpl implements GenreService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<List<GenreDto>>> getGenreFrequencyByArtis(Integer artistId) {
+		log.info("{} artistId : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistId);
 		List<GenreDto> lstResp = new ArrayList<>();
 		this.repository.getGenresFrequencyByArtis(artistId).forEach(gen -> lstResp.add(GenreDto.builder().genreName(gen.getGenreName()).frequency(gen.getFrequency()).build()));
 		return new ResponseEntity<>(

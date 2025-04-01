@@ -2,6 +2,7 @@ package com.clara.test.service.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.hibernate.exception.JDBCConnectionException;
@@ -29,6 +30,7 @@ import com.clara.test.dto.ReleaseStyleDto;
 import com.clara.test.dto.ResponseWrapper;
 import com.clara.test.dto.ResultDto;
 import com.clara.test.dto.StyleDto;
+import com.clara.test.dto.ValidationDto;
 import com.clara.test.entity.Genre;
 import com.clara.test.entity.Label;
 import com.clara.test.entity.Style;
@@ -119,8 +121,20 @@ public class DiscogServiceImpl implements DiscogService {
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> getArtist(
 			ArtistRequestDto artistRequestDto) throws InvalidValueException, DatabaseException {
+		log.info("{} artistRequestDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistRequestDto);
 		try {
-			ResponseEntity<ArtistDiscogResponseDto> discogResp =discogFeign.getArtist(artistRequestDto.getArtist(), artistRequestDto.getTitle(), artistRequestDto.getReleaseTitle(), artistRequestDto.getToken());
+			ValidationDto validationDto = this.validate(artistRequestDto);
+			if(!validationDto.isValid()) {
+				return new ResponseEntity<>(
+						ResponseWrapper.<ArtistDiscogResponseDto>builder()
+						.data(new ArtistDiscogResponseDto())
+						.message(validationDto.getMessage())
+						.status(HttpStatus.BAD_REQUEST)
+						.build(),
+						HttpStatus.BAD_REQUEST);
+			}
+			
+			ResponseEntity<ArtistDiscogResponseDto> discogResp =discogFeign.getArtist(artistRequestDto.getArtist(), artistRequestDto.getTitle(), artistRequestDto.getReleaseTitle(), discogToken);
 			
 			//Get the mastersId field
 			Integer masterId = discogResp.getBody().getResults().get(0).getMasterId();
@@ -129,7 +143,6 @@ public class DiscogServiceImpl implements DiscogService {
 			//Extract and get the artist
 			ResponseEntity<ArtistResponseDto> artistResponseDto = discogFeign.getArtistById(masterResponse.getBody().getArtists().get(0).getId());
 			
-//			ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.insert(artistResponseDto.getBody());
 			
 			//Save albums/releases
 			WebClient webClient = Webclient.getClient(artistResponseDto.getBody().getReleasesUrl());
@@ -179,9 +192,11 @@ public class DiscogServiceImpl implements DiscogService {
 					.build(),
 					discogResp.getStatusCode());
 		}catch(JDBCConnectionException ex) {
+			log.error("{} Error: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), ex);
 			throw new DatabaseException("Could not connect to the database");
 		}
 		catch(Exception ex) {
+			log.error("{} Error: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), ex);
 			throw new InvalidValueException("The artist could not be retrieved");
 		}
 	}
@@ -189,8 +204,19 @@ public class DiscogServiceImpl implements DiscogService {
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> compareArtists(
 			ArtistComparissonRequestDto artistComparissonRequestDto) {
-		log.info("compareArtists");
+		log.info("{} artistComparissonRequestDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),artistComparissonRequestDto);
 		try {
+			ValidationDto validationDto = this.validate(artistComparissonRequestDto);
+			if(!validationDto.isValid()) {
+				return new ResponseEntity<>(
+						ResponseWrapper.<ArtistComparissonResponseDto>builder()
+						.data(ArtistComparissonResponseDto.builder().build())
+						.message(validationDto.getMessage())
+						.status(HttpStatus.BAD_REQUEST)
+						.build(),
+						HttpStatus.BAD_REQUEST);
+			}
+			
 			List<ArtistDto> lstResp = new ArrayList<>();
 			for(String artist : artistComparissonRequestDto.getArtists()) {
 				ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findByName(ArtistResponseDto.builder().name(artist).build());
@@ -245,6 +271,7 @@ public class DiscogServiceImpl implements DiscogService {
 					.build(),
 					HttpStatus.OK);
 		}catch(Exception ex) {
+			log.error("{} Error: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), ex);
 			return new ResponseEntity<>(
 					ResponseWrapper.<ArtistComparissonResponseDto>builder()
 					.data(ArtistComparissonResponseDto.builder().build())
@@ -264,6 +291,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public List<Genre> setGenres(ResultDto resultDto){
+		log.info("{} resultDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), resultDto);
 		for(String genre: resultDto.getGenre()) {
 			GenreDto genreDto = GenreDto.builder().genreName(genre).build();
 			ResponseEntity<ResponseWrapper<GenreDto>> genreResp = this.genreService.findByName(genreDto);
@@ -287,6 +315,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public Object saveReleaseGenre(ReleaseDto releaseDto, GenreDto genreDto) {
+		log.info("{} releaseDto: {} genreDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), releaseDto, genreDto);
 		ResponseEntity<ResponseWrapper<ReleaseGenreDto>> releaseGenreResp = this.releaseGenreService.findByReleaseAndGenre(releaseDto.getId(), genreDto.getId());
 		if(!releaseGenreResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseGenreService.insert(ReleaseGenreDto.builder().genre(genreDto).release(releaseDto).build());
@@ -302,6 +331,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public List<Label> setLabels(ResultDto resultDto){
+		log.info("{} resultDto:  {}", Thread.currentThread().getStackTrace()[1].getMethodName(), resultDto);
 		for(String label: resultDto.getLabel()) {
 			LabelDto labelDto = LabelDto.builder().labelName(label).build();
 			ResponseEntity<ResponseWrapper<LabelDto>> labelResp = this.labelService.findByName(labelDto);
@@ -326,6 +356,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public Object saveReleaseLabel(ReleaseDto releaseDto, LabelDto labelDto) {
+		log.info("{} releaseDto: {} labelDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(),releaseDto, labelDto);
 		ResponseEntity<ResponseWrapper<ReleaseLabelDto>> releaseLabelResp = this.releaseLabelService.findByReleaseAndLabel(releaseDto.getId(), labelDto.getId());
 		if(!releaseLabelResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseLabelService.insert(ReleaseLabelDto.builder().release(releaseDto).label(labelDto).build());
@@ -340,6 +371,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public List<Style> setStyles(ResultDto resultDto){
+		log.info("{} resultDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), resultDto);
 		for(String style: resultDto.getStyle()) {
 			StyleDto styleDto = StyleDto.builder().styleName(style).build();
 			ResponseEntity<ResponseWrapper<StyleDto>> styleResp = this.styleService.findByName(styleDto);
@@ -364,6 +396,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public Object saveReleaseStyle(ReleaseDto releaseDto, StyleDto styleDto) {
+		log.info("{} releaseDto: {}, styleDto : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), releaseDto, styleDto);
 		ResponseEntity<ResponseWrapper<ReleaseStyleDto>> releaseStyleResp = this.releaseStyleService.findByReleaseAndStyle(releaseDto.getId(), styleDto.getId());
 		if(!releaseStyleResp.getStatusCode().is2xxSuccessful()) {
 			this.releaseStyleService.insert(ReleaseStyleDto.builder().release(releaseDto).style(styleDto).build());
@@ -405,7 +438,7 @@ public class DiscogServiceImpl implements DiscogService {
 	}
 	
 	private void setYearsActive(ArtistDto artistDto) throws NotFoundException {
-		log.info("setYearsActive");
+		log.info("{} ArtistDto : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistDto);
 		ResponseEntity<ResponseWrapper<List<Integer>>> lstReleaseYearsResp =  this.artistReleaseService.getReleaseYears(artistDto.getId().intValue());
 		if(!lstReleaseYearsResp.getStatusCode().is2xxSuccessful()) {
 			throw new NotFoundException("No releases found for this artist");
@@ -422,6 +455,7 @@ public class DiscogServiceImpl implements DiscogService {
 	 * @author Daniel Orlando López Ochoa
 	 */
 	public void setLightweightDto(ArtistComparissonResponseDto artistComparissonResponseDto) {
+		log.info("{} artistComparissonResponseDto : {}", Thread.currentThread().getStackTrace()[1].getMethodName(), artistComparissonResponseDto);
 		List<ArtistDto> lstArtists = new ArrayList<>();
 		for(ArtistDto artistDto : artistComparissonResponseDto.getArtists()) {
 			ArtistDto lightweightArtistDto = ArtistDto.builder()
@@ -439,6 +473,18 @@ public class DiscogServiceImpl implements DiscogService {
 
 	@Override
 	public ResponseEntity<ResponseWrapper<ArtistDto>> getDiscography(DiscographyRequestDto discographyRequestDto) {
+		log.info("{}  discographyRequestDto: {}", Thread.currentThread().getStackTrace()[1].getMethodName(), discographyRequestDto);
+		ValidationDto validationDto = this.validate(discographyRequestDto);
+		if(!validationDto.isValid()) {
+			return new ResponseEntity<>(
+					ResponseWrapper.<ArtistDto>builder()
+					.data(ArtistDto.builder().build())
+					.message(validationDto.getMessage())
+					.status(HttpStatus.BAD_REQUEST)
+					.build(),
+					HttpStatus.BAD_REQUEST);
+		}
+		
 		List<ReleaseDto> releases = new ArrayList<>();
 		
 		ResponseEntity<ResponseWrapper<ArtistResponseDto>> artistResp = this.artistService.findById(discographyRequestDto.getArtistId());
@@ -459,6 +505,36 @@ public class DiscogServiceImpl implements DiscogService {
 				.status(HttpStatus.OK)
 				.build(),
 				HttpStatus.OK);
+	}
+	
+	private ValidationDto validate(ArtistRequestDto artistRequestDto) {
+		if(Objects.isNull(artistRequestDto) || Objects.isNull(artistRequestDto.getArtist())) {
+			return ValidationDto.builder().isValid(false).message("The artist name is required").build();
+		}
+		return ValidationDto.builder().isValid(true).message("Validation OK").build();
+	}
+	
+	private ValidationDto validate(ArtistComparissonRequestDto artistComparissonRequestDto) {
+		if(Objects.isNull(artistComparissonRequestDto) 
+				|| Objects.isNull(artistComparissonRequestDto.getArtists())
+				|| artistComparissonRequestDto.getArtists().isEmpty() || artistComparissonRequestDto.getArtists().size()==1) {
+			return ValidationDto.builder().isValid(false).message("There is not enough artists for make a comparisson").build();
+		}
+		return ValidationDto.builder().isValid(true).message("Validation OK").build();
+	}
+	
+	private ValidationDto validate(DiscographyRequestDto discographyRequestDto) {
+		if(Objects.isNull(discographyRequestDto) 
+				|| Objects.isNull(discographyRequestDto.getPage()) || Objects.isNull(discographyRequestDto.getPageSize())) {
+			return ValidationDto.builder().isValid(false).message("The pagination is required").build();
+		}
+		if(Objects.isNull(discographyRequestDto.getArtistId())) {
+			return ValidationDto.builder().isValid(false).message("The artist id is requierd").build();
+		}
+		if(discographyRequestDto.getPage()<0 || discographyRequestDto.getPageSize().compareTo(1)==-1) {
+			return ValidationDto.builder().isValid(false).message("The page cannot be negative. The page size cannot be 0 or less than 0").build();
+		}
+		return ValidationDto.builder().isValid(true).message("Validation OK").build();
 	}
 
 	

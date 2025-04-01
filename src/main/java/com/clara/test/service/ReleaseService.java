@@ -20,7 +20,7 @@ public interface ReleaseService {
 	
 	
 	/**
-	 * 
+	 * <p>Create several new releases from the list</p>
 	 * @param lstReleaseDtos
 	 * @return
 	 * @author Daniel Orlando López Ochoa
@@ -28,7 +28,12 @@ public interface ReleaseService {
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> insert(List<ReleaseDto> lstReleaseDtos);
 	
 	
-	
+	/**
+	 * 
+	 * @param artistId
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> getReleasesByArtist(Integer artistId);
 	
 	/**
@@ -39,11 +44,18 @@ public interface ReleaseService {
 	 */
 	public ResponseEntity<ResponseWrapper<List<ReleaseDto>>> save(List<ReleaseDto> lstReleaseDtos);
 	
+	
+	/**
+	 * <p>Create/update a release</p>
+	 * @param releaseDto
+	 * @return
+	 * @author Daniel Orlando López Ochoa
+	 */
 	public ResponseEntity<ResponseWrapper<ReleaseDto>> save(ReleaseDto releaseDto);
 	
 	
 	/**
-	 * 
+	 * <p>Get all discography(releases) associated to an artist</p>
 	 * @param discographyRequestDto
 	 * @return
 	 * @author Daniel Orlando López Ochoa
