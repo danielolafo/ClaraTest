@@ -5,6 +5,8 @@ import java.util.List;
 import com.clara.test.entity.Artist;
 import com.clara.test.entity.Image;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,8 @@ import lombok.Setter;
  * @author Daniel Orlando López Ochoa
  */
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class MasterResponseDto {

@@ -2,7 +2,6 @@ package com.clara.test.service;
 
 import org.springframework.http.ResponseEntity;
 
-import com.clara.test.dto.GenreDto;
 import com.clara.test.dto.ReleaseGenreDto;
 import com.clara.test.dto.ResponseWrapper;
 

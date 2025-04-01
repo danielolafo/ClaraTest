@@ -1,0 +1,99 @@
+{
+	"info": {
+		"_postman_id": "d95843ce-f8ef-4069-8964-1d0bd70b3557",
+		"name": "ClaraTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "compare-artists",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"artists\":[\"Nirvana\", \"Michael Jackson\", \"Queen\"],\r\n    \"criteria\": \"ReleaseYear\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/artist/compare-artists",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"artist",
+						"compare-artists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search-artist",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/artist/get?token=SxEuvLhFSsWFFEdmNIHAqyxxIgADANcYDpHRGQbR&artist=Nirvana",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"artist",
+						"get"
+					],
+					"query": [
+						{
+							"key": "token",
+							"value": "SxEuvLhFSsWFFEdmNIHAqyxxIgADANcYDpHRGQbR"
+						},
+						{
+							"key": "artist",
+							"value": "Nirvana"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "artist/get-discography",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/artist/get-discography/10000?page=1&pageSize=100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"artist",
+						"get-discography",
+						"10000"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

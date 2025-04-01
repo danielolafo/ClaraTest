@@ -13,16 +13,16 @@ import lombok.Setter;
 @Builder
 public class ArtistReleaseDto {
 
-	public Integer id;
-    public String title;
-    public String type;
-    public int main_release;
-    public String artist;
-    public String role;
-    public String resource_url;
-    public int year;
-    public String thumb;
-    public StatDto stats;
+	private Integer id;
+	private String title;
+	private String type;
+	private int main_release;
+	private String artist;
+	private String role;
+	private String resource_url;
+	private int year;
+	private String thumb;
+	private StatDto stats;
     private ArtistResponseDto artistResponseDto;
     private ReleaseDto release;
 	

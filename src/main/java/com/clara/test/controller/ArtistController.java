@@ -1,5 +1,7 @@
 package com.clara.test.controller;
 
+import java.awt.print.Book;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -22,6 +24,11 @@ import com.clara.test.exception.InvalidValueException;
 import com.clara.test.service.DiscogService;
 
 import io.micrometer.common.lang.NonNull;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/artist")
@@ -34,6 +41,13 @@ public class ArtistController {
 		this.discogService = discogService;
 	}
 	
+	@Operation(summary = "Get an artist searching by its name")
+	@ApiResponses(value = { 
+	  @ApiResponse(responseCode = "200", description = "Artist found", 
+	    content = { @Content(mediaType = "application/json", 
+	      schema = @Schema(implementation = ArtistDiscogResponseDto.class)) }),
+	  @ApiResponse(responseCode = "404", description = "Artist not found", 
+	    content = @Content) })
 	@GetMapping("/get")
 	public ResponseEntity<ResponseWrapper<ArtistDiscogResponseDto>> getArtist(
 			@RequestParam(value="artist", required=false) String artist,
@@ -45,6 +59,13 @@ public class ArtistController {
 	}
 	
 	
+	@Operation(summary = "Receive a list of artists and make a comparisson between artist discography")
+	@ApiResponses(value = { 
+	  @ApiResponse(responseCode = "200", description = "Artist comparisson data", 
+	    content = { @Content(mediaType = "application/json", 
+	      schema = @Schema(implementation = ArtistComparissonResponseDto.class)) }),
+	  @ApiResponse(responseCode = "400", description = "Not enough data for make the comparisson", 
+	    content = @Content) })
 	@PostMapping("/compare-artists")
 	public ResponseEntity<ResponseWrapper<ArtistComparissonResponseDto>> compareArtist(
 			@RequestBody ArtistComparissonRequestDto artistRequestDto){
@@ -52,6 +73,13 @@ public class ArtistController {
 		return discogService.compareArtists(artistRequestDto);
 	}
 	
+	@Operation(summary = "Get the discography of an artist")
+	@ApiResponses(value = { 
+	  @ApiResponse(responseCode = "200", description = "Artist disocgraphy data found", 
+	    content = { @Content(mediaType = "application/json", 
+	      schema = @Schema(implementation = ArtistComparissonResponseDto.class)) }),
+	  @ApiResponse(responseCode = "404", description = "Not foudn artist discography", 
+	    content = @Content) })
 	@GetMapping("/get-discography/{artistId}")
 	public ResponseEntity<ResponseWrapper<ArtistDto>> getDiscography(
 			@PathVariable("artistId") Integer artistId,

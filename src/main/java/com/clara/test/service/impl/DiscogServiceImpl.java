@@ -144,6 +144,8 @@ public class DiscogServiceImpl implements DiscogService {
 			ResponseEntity<ArtistResponseDto> artistResponseDto = discogFeign.getArtistById(masterResponse.getBody().getArtists().get(0).getId());
 			
 			
+			
+			
 			//Save albums/releases
 			WebClient webClient = Webclient.getClient(artistResponseDto.getBody().getReleasesUrl());
 			ArtistResponseDto artistResponseDto2 = webClient.get().exchange().block().bodyToMono(ArtistResponseDto.class).block();
